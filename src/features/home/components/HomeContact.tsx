@@ -1,0 +1,205 @@
+import React from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Github,
+  Linkedin,
+  Facebook,
+} from "lucide-react";
+
+const HomeContact = () => {
+  const leftVariants = {
+    hidden: {
+      x: -100,
+      opacity: 0,
+    },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        duration: 1,
+      },
+    },
+  };
+
+  const upVariants = {
+    hidden: {
+      y: 50,
+      opacity: 0,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 1.2,
+        delay: 0.5,
+        staggerChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: {
+      y: 50,
+      opacity: 0,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 1.2,
+      },
+    },
+  };
+
+  return (
+    <section className="contactContainer relative min-h-screen flex items-center justify-center ">
+      <div className="relative z-10 container mx-auto px-6">
+        <div className="grid lg:grid-cols-2 grid-cols-1 gap-16 items-center">
+          <motion.div 
+            className="contactLeft"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.75 }}
+            variants={leftVariants}
+          >
+            <div className="mb-8">
+              <h2 className="text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+                Get in touch
+                <span className="block text-yellow-500 dark:text-yellow-400">
+                  with me
+                </span>
+                <span className="p-3 inline-block px-6 mt-3 font-medium rounded-xl bg-yellow-300 dark:bg-yellow-500/20 dark:text-yellow-300">
+                  Anytime
+                </span>
+                
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                <Mail className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <p className="text-lg">
+                Always open to discuss new opportunities
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Right Section - Contact Information */}
+          <motion.div 
+            className="space-y-8"
+            variants={upVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.75 }}
+          >
+            <motion.div variants={itemVariants}>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+                Contact Information
+              </h3>
+
+              {/* Personal Info Card */}
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-4 mb-6">
+                  <Image
+                    src="https://res.cloudinary.com/dzkoc2zf7/image/upload/v1746976058/cropped-Kaung_Pyae_Aung-removebg-preview_1_1_oefxf8.png"
+                    alt="Profile"
+                    width={600}
+                    height={600}
+                    className="w-16 h-16 rounded-full"
+                  />
+                  <div>
+                    <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
+                      Kaung Pyae Aung
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Full Stack Developer
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 group">
+                    <Mail className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      kaungpyaeaung8123@gmail.com
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 group">
+                    <Phone className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      09983167263, 095109983
+                    </span>
+                  </div>
+
+                  <div className="flex items-start gap-3 group">
+                    <MapPin className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform mt-1" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      No 28 NateBan Street, Kyee Myint Daing, Yangon
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-3 group">
+                    <Calendar className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Open for new projects and collaborations
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Social Media */}
+              <motion.div variants={itemVariants}>
+                <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Connect With Me
+                </h4>
+                <div className="flex gap-4">
+                  <a
+                    href="https://github.com/KaungPyae223"
+                    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
+                  </a>
+                  <a
+                    href="https://www.facebook.com/profile.php?id=100013951484585"
+                    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Facebook className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/kaung-pyae-908324250/"
+                    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
+                  </a>
+                  <a
+                    href="https://www.linkedin.com/in/kaung-pyae-908324250/"
+                    className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Mail className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
+                  </a>
+                </div>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default HomeContact;
