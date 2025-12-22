@@ -1,6 +1,6 @@
 "use client";
 
-import { Sun, Moon, Github } from "lucide-react";
+import { Sun, Moon, Github, Globe, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
@@ -13,12 +13,21 @@ const navLinks = [
   { name: "Certificates", href: "/certificates" },
 ];
 
+const languages = [
+  { code: "en", label: "English" },
+  { code: "my", label: "မြန်မာ" },
+  { code: "ja", label: "日本語" },
+];
+
 const NavBar = () => {
   const pathname = usePathname();
   const [darkMode, setDarkMode] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(languages[0]);
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
   const navRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
 
   const previousScroll = useRef<number>(0);
 
@@ -32,6 +41,30 @@ const NavBar = () => {
 
     setDarkMode(initialMode === "dark");
     document.documentElement.classList.toggle("dark", initialMode === "dark");
+
+    // Load saved language
+    const storedLang = localStorage.getItem("language");
+    if (storedLang) {
+      const lang = languages.find((l) => l.code === storedLang);
+      if (lang) setCurrentLanguage(lang);
+    }
+  }, []);
+
+  // Close language menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        languageMenuRef.current &&
+        !languageMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsLanguageMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleScroll = () => {
@@ -79,6 +112,13 @@ const NavBar = () => {
     document.documentElement.classList.toggle("dark", newMode === "dark");
   };
 
+  const handleLanguageChange = (language: (typeof languages)[0]) => {
+    setCurrentLanguage(language);
+    localStorage.setItem("language", language.code);
+    setIsLanguageMenuOpen(false);
+    // Add your actual language change logic here
+  };
+
   return (
     <div ref={containerRef} className="h-28">
       <div
@@ -120,6 +160,57 @@ const NavBar = () => {
                 </Link>
               );
             })}
+          </div>
+
+          <div className="border-e border-gray-300 dark:border-gray-600 h-full hidden md:block" />
+
+          {/* Language Switcher */}
+          <div className="relative" ref={languageMenuRef}>
+            <button
+              onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
+              className="cursor-pointer p-3 flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
+              aria-label="Change language"
+            >
+              <Globe strokeWidth={1} size={20} />
+              <span className="text-sm font-medium">
+                {currentLanguage.label}
+              </span>
+              <motion.div
+                animate={{ rotate: isLanguageMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChevronDown size={16} strokeWidth={1} />
+              </motion.div>
+            </button>
+
+            <AnimatePresence>
+              {isLanguageMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg overflow-hidden min-w-[160px]"
+                >
+                  {languages.map((language, index) => (
+                    <motion.button
+                      key={language.code}
+                      onClick={() => handleLanguageChange(language)}
+                      className={`w-full px-4 py-3 text-left text-sm transition-colors ${
+                        currentLanguage.code === language.code
+                          ? "bg-yellow-600 dark:bg-gray-600 text-white"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <span className="font-medium">{language.label}</span>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <div className="border-e border-gray-300 dark:border-gray-600 h-full hidden md:block" />
