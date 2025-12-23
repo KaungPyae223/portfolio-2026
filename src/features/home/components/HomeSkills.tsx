@@ -87,12 +87,12 @@ const HomeSkills = () => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden  ">
       {/* Background decorative elements */}
-      
+
       <div className="relative z-10 container mx-auto px-6 py-16">
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.3 }}
           variants={titleVariants}
         >
           <div className="text-center mb-16">
@@ -108,7 +108,7 @@ const HomeSkills = () => {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: true, amount: 0.3 }}
           variants={containerVariants}
         >
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">

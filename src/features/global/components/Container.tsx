@@ -31,7 +31,7 @@ const Container: React.FC<ContainerProps> = ({ children, className }) => {
   return (
     <div ref={wrapperRef}>
       <div
-        className={`container mx-auto px-5 md:px-12 ${className} `}
+        className={`container mx-auto md:px-12 ${className} `}
         ref={contentRef}
       >
         {children}

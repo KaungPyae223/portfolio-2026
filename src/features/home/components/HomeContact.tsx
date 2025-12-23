@@ -58,7 +58,7 @@ const HomeContact = () => {
 
   return (
     <section className="contactContainer relative min-h-screen flex items-center justify-center ">
-      <div className="relative z-10 container mx-auto px-6">
+      <div className="relative z-10 container mx-auto p-6">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-16 items-center">
           <motion.div 
             className="contactLeft"

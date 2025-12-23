@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Calendar,
   Home,
@@ -8,6 +10,8 @@ import {
   FileText,
   BarChart3,
   LogOut,
+  Globe,
+  Award,
 } from "lucide-react";
 
 import {
@@ -23,40 +27,45 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function AdminNav() {
   const navigationItems = [
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: Home,
-    },
-    {
-      title: "Analytics",
-      url: "#",
       icon: BarChart3,
     },
     {
+      title: "Home",
+      url: "/dashboard/home",
+      icon: Home,
+    },
+    {
       title: "Projects",
-      url: "#",
+      url: "/dashboard/projects",
       icon: FileText,
     },
     {
-      title: "Messages",
-      url: "#",
-      icon: Inbox,
-      badge: "3",
+      title: "Certificates",
+      url: "/dashboard/certificates",
+      icon: Award,
     },
     {
-      title: "Calendar",
-      url: "#",
-      icon: Calendar,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: Search,
+      title: "About",
+      url: "/dashboard/about",
+      icon: User,
     },
   ];
 
@@ -67,6 +76,9 @@ export function AdminNav() {
       icon: Settings,
     },
   ];
+
+  const pathname = usePathname();
+
 
   return (
     <Sidebar>
@@ -87,6 +99,29 @@ export function AdminNav() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-4 text-xs font-medium text-muted-foreground">
+            Language
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="px-2">
+              <Select>
+                <SelectTrigger className="w-full">
+                  <Globe strokeWidth={1} size={20} />
+                  <SelectValue placeholder="Select a language" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Languages</SelectLabel>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="my">မြန်မာ</SelectItem>
+                    <SelectItem value="ja">日本語</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel className="px-4 text-xs font-medium text-muted-foreground">
             Main Menu
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -94,41 +129,21 @@ export function AdminNav() {
               {navigationItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild className="group">
-                    <a
+                    <Link
                       href={item.url}
-                      className="relative hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
+                      className={`${
+                        (
+                          item.url === "/dashboard"
+                            ? pathname === "/dashboard"
+                            : pathname.startsWith(item.url)
+                        )
+                          ? "bg-gray-800 text-gray-100"
+                          : ""
+                      } relative hover:bg-gray-800 hover:text-gray-100 rounded-lg transition-colors`}
                     >
                       <item.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
                       <span className="font-medium">{item.title}</span>
-                      {item.badge && (
-                        <span className="absolute right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                          {item.badge}
-                        </span>
-                      )}
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-xs font-medium text-muted-foreground">
-            Settings
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="px-2">
-              {settingsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="group">
-                    <a
-                      href={item.url}
-                      className="hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
-                    >
-                      <item.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
-                      <span className="font-medium">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

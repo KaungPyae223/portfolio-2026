@@ -7,32 +7,40 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useBreadCrumbStore } from "@/store/useBreadCrumbStroe";
+import { useDashboardStore } from "@/store/useDashboardStroe";
 
 const AdminBreadCrumb = () => {
-  const { breadCrumbContent } = useBreadCrumbStore();
+  const { breadCrumbContent, title } = useDashboardStore();
 
-  if (breadCrumbContent.length <= 1) {
-    return null;
-  }
+  console.log(title);
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        {breadCrumbContent.map((item, index) => (
-          <div key={index} className="flex items-center">
-            <BreadcrumbItem>
-              {index === breadCrumbContent.length - 1 ? (
-                <BreadcrumbPage>{item.title}</BreadcrumbPage>
-              ) : (
-                <BreadcrumbLink href={item.link}>{item.title}</BreadcrumbLink>
-              )}
-            </BreadcrumbItem>
-            {index < breadCrumbContent.length - 1 && <BreadcrumbSeparator />}
-          </div>
-        ))}
-      </BreadcrumbList>
-    </Breadcrumb>
+    <>
+      {breadCrumbContent.length > 2 && (
+        <Breadcrumb>
+          <BreadcrumbList>
+            {breadCrumbContent.map((item, index) => (
+              <div key={index} className="flex items-center">
+                <BreadcrumbItem>
+                  {index === breadCrumbContent.length - 1 ? (
+                    <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink href={item.link}>
+                      {item.title}
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {index < breadCrumbContent.length - 1 && (
+                  <BreadcrumbSeparator />
+                )}
+              </div>
+            ))}
+          </BreadcrumbList>
+        </Breadcrumb>
+      )}
+
+      <p className="text-lg font-semibold ms-auto">{title}</p>
+    </>
   );
 };
 

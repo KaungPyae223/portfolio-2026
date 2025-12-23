@@ -82,7 +82,7 @@ const HomeProjects = () => {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.5 }}
+          viewport={{ once: true }}
           variants={titleVariants}
         >
           <div className="text-center mb-16">
@@ -98,7 +98,7 @@ const HomeProjects = () => {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: true }}
           variants={containerVariants}
         >
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -113,7 +113,7 @@ const HomeProjects = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.3 }}
         >
           <div className="text-center mt-12">
             <a

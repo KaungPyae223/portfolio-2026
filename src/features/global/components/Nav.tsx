@@ -1,10 +1,17 @@
 "use client";
 
-import { Sun, Moon, Github, Globe, ChevronDown } from "lucide-react";
+import { Sun, Moon, Globe, ChevronDown, MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+
+import {
+  Drawer,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import HomeNav from "./HomeNav";
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -121,15 +128,24 @@ const NavBar = () => {
 
   return (
     <div ref={containerRef} className="h-28">
+      <Drawer direction="right">
+        <DrawerTrigger>
+          <div className="md:hidden fixed top-5 right-5 z-50 cursor-pointer p-3 rounded-full bg-white dark:bg-gray-800 shadow-lg">
+            <MenuIcon />
+          </div>
+        </DrawerTrigger>
+         <HomeNav />
+      </Drawer>
+
       <div
         ref={navRef}
-        className="py-10 md:py-5 h-28 fixed duration-700 flex justify-center w-full z-50"
+        className="py-10 md:py-5 h-28 hidden  fixed duration-700 md:flex justify-center w-full z-50"
       >
         <div className="bg-white dark:bg-gray-800 border border-white/50 shadow-lg p-3 rounded-full flex items-center gap-5 transition-colors">
-          <p className="font-medium px-5 text-lg hidden md:block text-gray-800 dark:text-gray-100">
+          <p className="font-medium px-5 text-lg hidden lg:block text-gray-800 dark:text-gray-100">
             Kaung Pyae&apos;s portfolio
           </p>
-          <div className="border-e border-gray-300 dark:border-gray-600 h-full hidden md:block" />
+          <div className="border-e border-gray-300 dark:border-gray-600 h-full hidden lg:block" />
 
           <div className="flex flex-row relative items-center gap-5">
             {navLinks.map((link) => {

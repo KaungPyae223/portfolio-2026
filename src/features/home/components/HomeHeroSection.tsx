@@ -82,12 +82,12 @@ const HomeHeroSection = () => {
 
   return (
     <section className="flex flex-col items-center justify-center min-h-screen py-16 mx-5 transition-colors duration-300">
-      <div className="flex text-5xl flex-row items-center">
-        <p className="name  p-5 font-semibold">I&apos;m</p>
+      <div className="flex text-3xl md:text-5xl flex-col md:flex-row items-center">
+        <p className="name p-5 dark:text-white font-semibold">I&apos;m</p>
         <div
           onMouseEnter={() => nameAnimate.current?.play()}
           onMouseLeave={() => nameAnimate.current?.pause(0)}
-          className="name space-x-3  p-5 rounded-xl bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-semibold transition-colors duration-300"
+          className="name space-x-3 flex flex-row  p-5 rounded-xl bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 font-semibold transition-colors duration-300"
         >
           {name.split(" ").map((word, index) => (
             <span key={index} className="inline-block name-word ">
