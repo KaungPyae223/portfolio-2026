@@ -54,7 +54,7 @@ const AboutEducation = () => {
         />
       </div>
       <div className="row-start-1 md:col-start-2">
-        <p className="text-5xl mb-10 educationUp leading-[5rem]">
+        <p className="text-5xl dark:text-white mb-10 educationUp leading-[5rem]">
           My{" "}
           <span className="p-3 px-6 font-medium rounded-xl  bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900">
             Education

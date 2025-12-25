@@ -1,10 +1,6 @@
 "use client";
-import HomeHeroSection from "@/features/home/components/HomeHeroSection";
 
 import DashboardHomeCard from "../components/DashboardHomeCard";
-import HomePersonalInfo from "@/features/home/components/HomePersonalInfo";
-import HomeSkills from "@/features/home/components/HomeSkills";
-import HomeContact from "@/features/home/components/HomeContact";
 import { useDashboardStore } from "@/store/useDashboardStroe";
 import { useEffect } from "react";
 
@@ -17,13 +13,26 @@ const DashboardHomePage = () => {
 
   return (
     <div className="p-3 space-y-6 ">
-      <DashboardHomeCard title="Home Hero Section" url="/homeHero" />
       <DashboardHomeCard
+        editLink="/dashboard/home/hero-edit"
+        title="Home Hero Section"
+        url="/homeHero"
+      />
+      <DashboardHomeCard
+        editLink="/dashboard/home/personal-info-edit"
         title="Home Personal Info Section"
         url="/homePersonalInfo"
       />
-      <DashboardHomeCard title="Home Skills Section" url="/homeSkills" />
-      <DashboardHomeCard title="Home Contact Section" url="/homeContact" />
+      <DashboardHomeCard
+        editLink="/dashboard/home/my-skill-edit"
+        title="Home Skills Section"
+        url="/homeSkills"
+      />
+      <DashboardHomeCard
+        editLink="/dashboard/home/contact-edit"
+        title="Home Contact Section"
+        url="/homeContact"
+      />
     </div>
   );
 };

@@ -15,13 +15,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
+import Link from "next/link";
 
 interface HomeCardType {
   title: string;
   url: string;
+  editLink: string;
 }
 
-const DashboardHomeCard: React.FC<HomeCardType> = ({ title, url }) => {
+const DashboardHomeCard: React.FC<HomeCardType> = ({
+  title,
+  url,
+  editLink,
+}) => {
   const [isDark, setIsDark] = useState(false);
 
   const devideInfo = {
@@ -52,18 +58,21 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({ title, url }) => {
             <Button
               onClick={() => setDevide("phone")}
               variant={devide == "phone" ? "default" : "outline"}
+              size={"icon"}
             >
               <Smartphone className="h-4 w-4" />
             </Button>
             <Button
               onClick={() => setDevide("tablet")}
               variant={devide == "tablet" ? "default" : "outline"}
+              size={"icon"}
             >
               <Tablet className="h-4 w-4" />
             </Button>
             <Button
               onClick={() => setDevide("desktop")}
               variant={devide == "desktop" ? "default" : "outline"}
+              size={"icon"}
             >
               <Monitor className="h-4 w-4" />
             </Button>
@@ -81,10 +90,12 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({ title, url }) => {
             )}
           </Button>
 
-          <Button size="sm" variant={"destructive"} className="gap-2">
-            <Pencil className="h-4 w-4" />
-            Edit
-          </Button>
+          <Link href={editLink}>
+            <Button size={"sm"} variant={"destructive"} className="gap-2">
+              <Pencil className="h-4 w-4" />
+              Edit
+            </Button>
+          </Link>
         </div>
       </CardHeader>
 
@@ -93,11 +104,11 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({ title, url }) => {
       {/* Content */}
       <CardContent className="p-3">
         <div
-          className={`${devideInfo[devide]} transform duration-300 relative  mx-auto rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 `}
+          className={`${devideInfo[devide]}  dark:bg-gray-800 transform duration-300 relative  mx-auto rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 `}
         >
           <iframe
             src={url + "?dark=" + isDark}
-            className="absolute inset-0 w-full h-full "
+            className="absolute  inset-0 w-full h-full "
           />
         </div>
       </CardContent>

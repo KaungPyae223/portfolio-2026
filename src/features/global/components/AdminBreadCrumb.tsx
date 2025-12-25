@@ -12,11 +12,9 @@ import { useDashboardStore } from "@/store/useDashboardStroe";
 const AdminBreadCrumb = () => {
   const { breadCrumbContent, title } = useDashboardStore();
 
-  console.log(title);
-
   return (
     <>
-      {breadCrumbContent.length > 2 && (
+      {breadCrumbContent.length > 1 && (
         <Breadcrumb>
           <BreadcrumbList>
             {breadCrumbContent.map((item, index) => (

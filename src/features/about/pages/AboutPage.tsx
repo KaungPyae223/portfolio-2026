@@ -7,7 +7,7 @@ import AboutExperiences from "../components/AboutExperiences";
 
 const AboutPage = () => {
   return (
-    <Container className="space-y-12 pt-28">
+    <Container className="space-y-12 pt-12">
       <AboutIntro />
       <AboutEducation />
       <AboutExperiences />

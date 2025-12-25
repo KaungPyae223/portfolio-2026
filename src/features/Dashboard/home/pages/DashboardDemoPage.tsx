@@ -7,6 +7,9 @@ import HomeHeroSection from "@/features/home/components/HomeHeroSection";
 import HomePersonalInfo from "@/features/home/components/HomePersonalInfo";
 import HomeSkills from "@/features/home/components/HomeSkills";
 import HomeContact from "@/features/home/components/HomeContact";
+import AboutIntro from "@/features/about/components/AboutIntro";
+import AboutEducation from "@/features/about/components/AboutEducation";
+import AboutExperiences from "@/features/about/components/AboutExperiences";
 
 type Props = {
   section: string;
@@ -21,6 +24,9 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
     homePersonalInfo: <HomePersonalInfo />,
     homeSkills: <HomeSkills />,
     homeContact: <HomeContact />,
+    aboutIntro: <AboutIntro />,
+    aboutExperiences: <AboutExperiences />,
+    aboutEducation: <AboutEducation />,
   };
 
   return (

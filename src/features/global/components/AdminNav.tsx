@@ -12,6 +12,7 @@ import {
   LogOut,
   Globe,
   Award,
+  Logs,
 } from "lucide-react";
 
 import {
@@ -53,6 +54,11 @@ export function AdminNav() {
       icon: Home,
     },
     {
+      title: "About",
+      url: "/dashboard/about",
+      icon: User,
+    },
+    {
       title: "Projects",
       url: "/dashboard/projects",
       icon: FileText,
@@ -62,10 +68,11 @@ export function AdminNav() {
       url: "/dashboard/certificates",
       icon: Award,
     },
+
     {
-      title: "About",
-      url: "/dashboard/about",
-      icon: User,
+      title: "History",
+      url: "/dashboard/history",
+      icon: Logs,
     },
   ];
 
@@ -78,7 +85,6 @@ export function AdminNav() {
   ];
 
   const pathname = usePathname();
-
 
   return (
     <Sidebar>
