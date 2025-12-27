@@ -132,20 +132,11 @@ const AboutExperiences = () => {
               <div className="relative z-10">
                 {/* Icon and Title */}
                 <div className="flex items-center mb-4">
-                  <span className="text-3xl mr-3">{experience.icon}</span>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                       {experience.title}
                     </h3>
-                    <span
-                      className={`inline-block mt-1 px-2 py-1 text-xs font-medium rounded-full ${
-                        experience.level === "Advanced"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                          : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                      }`}
-                    >
-                      {experience.level}
-                    </span>
+                   
                   </div>
                 </div>
 
@@ -155,16 +146,7 @@ const AboutExperiences = () => {
                 </p>
 
                 {/* Skills */}
-                <div className="flex flex-wrap gap-2">
-                  {experience.skills.map((skill, skillIndex) => (
-                    <span
-                      key={skillIndex}
-                      className="skill-tag px-3 py-1 text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-yellow-100 dark:hover:bg-yellow-900/30 hover:text-yellow-700 dark:hover:text-yellow-300 transition-all duration-300"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+               
               </div>
             </motion.div>
           ))}

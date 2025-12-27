@@ -4,10 +4,11 @@ import React, { useEffect } from "react";
 import DashboardHomeCard from "../../home/components/DashboardHomeCard";
 
 const DashboardAboutPage = () => {
-  const { setTitle } = useDashboardStore();
+  const { setTitle, setBreadCrumbContent } = useDashboardStore();
 
   useEffect(() => {
     setTitle("About Page Management");
+    setBreadCrumbContent([]);
   }, []);
 
   return (

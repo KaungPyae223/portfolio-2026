@@ -5,10 +5,11 @@ import { useDashboardStore } from "@/store/useDashboardStroe";
 import { useEffect } from "react";
 
 const DashboardHomePage = () => {
-  const { setTitle } = useDashboardStore();
+  const { setTitle, setBreadCrumbContent } = useDashboardStore();
 
   useEffect(() => {
     setTitle("Home Page Management");
+    setBreadCrumbContent([]);
   }, []);
 
   return (
