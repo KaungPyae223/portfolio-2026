@@ -39,7 +39,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export function AdminNav() {
   const navigationItems = [
@@ -86,6 +86,10 @@ export function AdminNav() {
 
   const pathname = usePathname();
 
+  const router = useRouter();
+
+  const param = useSearchParams();
+
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-border">
@@ -109,7 +113,10 @@ export function AdminNav() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-2">
-              <Select>
+              <Select
+                defaultValue={param.get("language") || "English"}
+                onValueChange={(value) => router.push("?language=" + value)}
+              >
                 <SelectTrigger className="w-full">
                   <Globe strokeWidth={1} size={20} />
                   <SelectValue placeholder="Select a language" />
@@ -117,9 +124,8 @@ export function AdminNav() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Languages</SelectLabel>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="my">မြန်မာ</SelectItem>
-                    <SelectItem value="ja">日本語</SelectItem>
+                    <SelectItem value="English">English</SelectItem>
+                    <SelectItem value="Japanese">Japanese</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

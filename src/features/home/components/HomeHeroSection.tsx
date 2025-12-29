@@ -6,7 +6,19 @@ import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-const HomeHeroSection = () => {
+type HomeHeroSectionProps = {
+  prefix: string;
+  name: string;
+  title: string;
+  content: string;
+};
+
+const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
+  prefix,
+  name,
+  title,
+  content,
+}) => {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.set(".name", { opacity: 0, y: 50 });
@@ -75,15 +87,10 @@ const HomeHeroSection = () => {
   const [projectsHover, setProjectsHover] = useState(false);
   const [contentHover, setContentHover] = useState(false);
 
-  const name = "Kaung Pyae Aung";
-  const title = "Full stack web developer";
-  const content =
-    "I recently finished the Bachelor of Computing and have an experience in web development with HTML, CSS, JavaScript, React, Next.js and Laravel. I have completed several projects, including portfolio websites, e-commerce, e-learning platforms, and others.";
-
   return (
     <section className="flex flex-col items-center justify-center min-h-screen py-16 mx-5 transition-colors duration-300">
       <div className="flex text-3xl md:text-5xl flex-col md:flex-row items-center">
-        <p className="name p-5 dark:text-white font-semibold">I&apos;m</p>
+        <p className="name p-5 dark:text-white font-semibold">{prefix}</p>
         <div
           onMouseEnter={() => nameAnimate.current?.play()}
           onMouseLeave={() => nameAnimate.current?.pause(0)}
@@ -116,7 +123,7 @@ const HomeHeroSection = () => {
         animate={{
           fontSize: contentHover ? "1.3rem" : "1.125rem",
         }}
-        className="md:w-1/2 content-container mx-auto hover:bg-gray-200 dark:hover:bg-gray-800 space-x-2 md:mt-3 mt-8 text-center  dark:text-gray-300 transition-colors duration-300 rounded-xl px-4 py-3"
+        className="md:w-2/3 content-container mx-auto hover:bg-gray-200 dark:hover:bg-gray-800 space-x-2 md:mt-3 mt-8 text-center  dark:text-gray-300 transition-colors duration-300 rounded-xl px-4 py-3"
       >
         {content.split(" ").map((word, index) => (
           <span key={index} className="inline-block content">
@@ -169,7 +176,6 @@ const HomeHeroSection = () => {
           View My Projects
         </Link>
       </div>
-    
     </section>
   );
 };

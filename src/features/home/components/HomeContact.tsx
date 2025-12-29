@@ -11,7 +11,27 @@ import {
   Facebook,
 } from "lucide-react";
 
-const HomeContact = () => {
+type HomeContractProps = {
+  name: string;
+  title: string;
+  location: string;
+  email: string;
+  github: string;
+  linkedin: string;
+  facebook: string;
+  phone: string;
+};
+
+const HomeContact: React.FC<HomeContractProps> = ({
+  name,
+  title,
+  location,
+  linkedin,
+  email,
+  github,
+  facebook,
+  phone,
+}) => {
   const leftVariants = {
     hidden: {
       x: -100,
@@ -60,7 +80,7 @@ const HomeContact = () => {
     <section className="contactContainer relative min-h-screen flex items-center justify-center ">
       <div className="relative z-10 container mx-auto p-6">
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-16 items-center">
-          <motion.div 
+          <motion.div
             className="contactLeft"
             initial="hidden"
             whileInView="visible"
@@ -76,7 +96,6 @@ const HomeContact = () => {
                 <span className="p-3 inline-block px-6 mt-3 font-medium rounded-xl bg-yellow-300 dark:bg-yellow-500/20 dark:text-yellow-300">
                   Anytime
                 </span>
-                
               </h2>
             </div>
 
@@ -91,7 +110,7 @@ const HomeContact = () => {
           </motion.div>
 
           {/* Right Section - Contact Information */}
-          <motion.div 
+          <motion.div
             className="space-y-8"
             variants={upVariants}
             initial="hidden"
@@ -115,11 +134,9 @@ const HomeContact = () => {
                   />
                   <div>
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      Kaung Pyae Aung
+                      {name}
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Full Stack Developer
-                    </p>
+                    <p className="text-gray-600 dark:text-gray-300">{title}</p>
                   </div>
                 </div>
 
@@ -127,21 +144,21 @@ const HomeContact = () => {
                   <div className="flex items-center gap-3 group">
                     <Mail className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
                     <span className="text-gray-700 dark:text-gray-300">
-                      kaungpyaeaung8123@gmail.com
+                      {email}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3 group">
                     <Phone className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
                     <span className="text-gray-700 dark:text-gray-300">
-                      09983167263, 095109983
+                      {phone}
                     </span>
                   </div>
 
                   <div className="flex items-start gap-3 group">
                     <MapPin className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform mt-1" />
                     <span className="text-gray-700 dark:text-gray-300">
-                      No 28 NateBan Street, Kyee Myint Daing, Yangon
+                      {location}
                     </span>
                   </div>
 
@@ -161,7 +178,7 @@ const HomeContact = () => {
                 </h4>
                 <div className="flex gap-4">
                   <a
-                    href="https://github.com/KaungPyae223"
+                    href={github}
                     className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -169,7 +186,7 @@ const HomeContact = () => {
                     <Github className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
                   </a>
                   <a
-                    href="https://www.facebook.com/profile.php?id=100013951484585"
+                    href={facebook}
                     className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -177,7 +194,7 @@ const HomeContact = () => {
                     <Facebook className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
                   </a>
                   <a
-                    href="https://www.linkedin.com/in/kaung-pyae-908324250/"
+                    href={linkedin}
                     className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -185,7 +202,7 @@ const HomeContact = () => {
                     <Linkedin className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
                   </a>
                   <a
-                    href="https://www.linkedin.com/in/kaung-pyae-908324250/"
+                    href={`mailto:${email}`}
                     className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors group"
                     target="_blank"
                     rel="noopener noreferrer"

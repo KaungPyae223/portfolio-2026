@@ -10,6 +10,9 @@ import HomeContact from "@/features/home/components/HomeContact";
 import AboutIntro from "@/features/about/components/AboutIntro";
 import AboutEducation from "@/features/about/components/AboutEducation";
 import AboutExperiences from "@/features/about/components/AboutExperiences";
+import useSWR from "swr";
+import { fetcher } from "@/services/fetcher";
+import Loading from "@/features/global/components/Loading";
 
 type Props = {
   section: string;
@@ -19,15 +22,60 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
   const searchParams = useSearchParams();
   const darkMode = searchParams.get("dark") === "true";
 
+  const param = useSearchParams();
+
+  const language = param.get("language") || "English";
+
+  const { data, error, isLoading } = useSWR(
+    `/user-side/home?language=${language}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    }
+  );
+
   const sectionMap: Record<string, React.ReactNode> = {
-    homeHero: <HomeHeroSection />,
-    homePersonalInfo: <HomePersonalInfo />,
+    homeHero: (
+      <HomeHeroSection
+        prefix={data?.data.prefix}
+        name={data?.data.name}
+        title={data?.data.title}
+        content={data?.data.content}
+      />
+    ),
+    homePersonalInfo: (
+      <HomePersonalInfo
+        name={data?.data.name}
+        dob={data?.data.date_of_birth}
+        location={data?.data.location}
+        email={data?.data.email}
+        phone={data?.data.phone}
+        educations={data?.data.educations}
+        experiences={data?.data.experiences}
+      />
+    ),
     homeSkills: <HomeSkills />,
-    homeContact: <HomeContact />,
+    homeContact: (
+      <HomeContact
+        name={data?.data.name}
+        phone={data?.data.phone}
+        title={data?.data.title}
+        location={data?.data.location}
+        email={data?.data.email}
+        github={data?.data.github}
+        linkedin={data?.data.linkedin}
+        facebook={data?.data.facebook}
+      />
+    ),
     aboutIntro: <AboutIntro />,
     aboutExperiences: <AboutExperiences />,
     aboutEducation: <AboutEducation />,
   };
+
+  if (isLoading) return <Loading />;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div

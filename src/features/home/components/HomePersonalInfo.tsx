@@ -18,7 +18,25 @@ import {
 } from "lucide-react";
 gsap.registerPlugin(ScrollTrigger);
 
-const HomePersonalInfo = () => {
+type HomePersonalInfoProps = {
+  name: string;
+  dob: string;
+  location: string;
+  email: string;
+  phone: string;
+  educations: any[];
+  experiences: any[];
+};
+
+const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
+  name,
+  dob,
+  location,
+  email,
+  phone,
+  educations,
+  experiences,
+}) => {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
@@ -101,7 +119,7 @@ const HomePersonalInfo = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Name
                       </p>
-                      <p className="font-medium">Kaung Pyae Aung</p>
+                      <p className="font-medium">{name}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
@@ -110,7 +128,7 @@ const HomePersonalInfo = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Date of Birth
                       </p>
-                      <p className="font-medium">December 8, 2003</p>
+                      <p className="font-medium">{dob}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
@@ -119,7 +137,7 @@ const HomePersonalInfo = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Location
                       </p>
-                      <p className="font-medium">Yangon, Myanmar</p>
+                      <p className="font-medium">{location}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
@@ -128,7 +146,7 @@ const HomePersonalInfo = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Email
                       </p>
-                      <p className="font-medium">kaungpyaeaung@example.com</p>
+                      <p className="font-medium">{email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
@@ -137,7 +155,7 @@ const HomePersonalInfo = () => {
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         Phone
                       </p>
-                      <p className="font-medium">+95 123 456 789</p>
+                      <p className="font-medium">{phone}</p>
                     </div>
                   </div>
                 </div>
@@ -162,46 +180,19 @@ const HomePersonalInfo = () => {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      High School Graduate
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2019 - 2020
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      NCC Level 4 Diploma in Computing
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2022 - 2023
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      NCC Level 5 Diploma in Computing
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2023 - 2024
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      Bachelor of Computing, University of Greenwich
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2024 - 2025
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      MMSIT SWD & WAD
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2023 - 2024
-                    </p>
-                  </div>
+                  {educations.map((edu) => (
+                    <div
+                      key={edu.id}
+                      className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4"
+                    >
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {edu.title}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {edu.description}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -214,30 +205,19 @@ const HomePersonalInfo = () => {
                   </h3>
                 </div>
                 <div className="space-y-3">
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      MMSIT Full Stack Developer
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2024 - 2025
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      ET-Verdict Freelance Backend Developer
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2025
-                    </p>
-                  </div>
-                  <div className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4">
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      Netra Full Stack Developer
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      2025 ~
-                    </p>
-                  </div>
+                  {experiences.map((exp) => (
+                    <div
+                      key={exp.id}
+                      className="border-l-2 border-yellow-600 dark:border-yellow-400 pl-4"
+                    >
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {exp.title}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {exp.description}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
 

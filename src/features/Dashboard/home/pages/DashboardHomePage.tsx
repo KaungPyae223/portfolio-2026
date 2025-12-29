@@ -17,22 +17,22 @@ const DashboardHomePage = () => {
       <DashboardHomeCard
         editLink="/dashboard/home/hero-edit"
         title="Home Hero Section"
-        url="/homeHero"
+        url={`/homeHero`}
       />
       <DashboardHomeCard
         editLink="/dashboard/home/personal-info-edit"
         title="Home Personal Info Section"
-        url="/homePersonalInfo"
+        url={`/homePersonalInfo`}
       />
       <DashboardHomeCard
         editLink="/dashboard/home/my-skill-edit"
         title="Home Skills Section"
-        url="/homeSkills"
+        url={`/homeSkills`}
       />
       <DashboardHomeCard
         editLink="/dashboard/home/contact-edit"
         title="Home Contact Section"
-        url="/homeContact"
+        url={`/homeContact`}
       />
     </div>
   );

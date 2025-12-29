@@ -18,11 +18,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import HomeHeroManagementPreview from "./HomeHeroManagementPreview";
 import Link from "next/link";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/services/fetcher";
+import { api } from "@/services/api";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   prefix: z
@@ -40,29 +45,63 @@ const formSchema = z.object({
   content: z
     .string()
     .min(2, { message: "content is required" })
-    .max(50, { message: "content is too long" }),
+    .max(500, { message: "content is too long" }),
 });
 
 const HomeHeroManagementForm = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const { data, error, isLoading } = useSWR(
+    "/home-management/get-all-home",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
 
-  // 1. Define your form.
+  const [activeTab, setActiveTab] = useState("English");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prefix: "I'm",
-      name: "Kaung Pyae Aung",
-      title: "Full stack web developer",
-      content:
-        "I recently finished the Bachelor of Computing and have an experience in web development with HTML, CSS, JavaScript, React, Next.js and Laravel. I have completed several projects, including portfolio websites, e-commerce, e-learning platforms, and others.",
+      prefix: "",
+      name: "",
+      title: "",
+      content: "",
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const selectedData = data?.data.find(
+      (item: any) => item.language === activeTab
+    );
+
+    form.setValue("prefix", selectedData?.prefix);
+    form.setValue("name", selectedData?.name);
+    form.setValue("title", selectedData?.title);
+    form.setValue("content", selectedData?.content);
+  }, [data, activeTab, isLoading]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await api.put("/home-management/hero-manage", {
+        language: activeTab,
+        name: values.name,
+        prefix: values.prefix,
+        title: values.title,
+        content: values.content,
+      });
+      mutate("/home-management/get-all-home");
+      mutate("/user-side/home?language=" + activeTab);
+      toast.success("Updated successfully");
+      // router.push("/dashboard/home");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   }
 
   return (
@@ -91,13 +130,30 @@ const HomeHeroManagementForm = () => {
 
               {/* Language Tabs */}
               <div className="inline-flex rounded-lg bg-gray-100 p-1">
-                <button className="rounded-md bg-white px-4 py-1.5 text-sm font-medium shadow">
-                  Myanmar
-                </button>
-                <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab("English");
+                  }}
+                  className={`${
+                    activeTab == "English"
+                      ? "bg-white shadow font-medium"
+                      : "text-gray-600 hover:text-black"
+                  } rounded-md px-4 py-1.5 text-sm `}
+                >
                   English
                 </button>
-                <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab("Japanese");
+                  }}
+                  className={`${
+                    activeTab == "Japanese"
+                      ? "bg-white shadow font-medium"
+                      : "text-gray-600 hover:text-black"
+                  } rounded-md px-4 py-1.5 text-sm `}
+                >
                   Japanese
                 </button>
               </div>

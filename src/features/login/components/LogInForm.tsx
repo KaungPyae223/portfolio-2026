@@ -20,6 +20,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { api } from "@/services/api";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+import { Toaster } from "@/components/ui/sonner";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -31,6 +36,7 @@ const formSchema = z.object({
 });
 
 const LogInForm = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,14 +50,30 @@ const LogInForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     // Simulate API call
-    console.log(values);
-    setTimeout(() => {
+
+    try {
+      setIsLoading(true);
+
+      const response = await api.post("/auth/login", {
+        email: values.email,
+        password: values.password,
+      });
+
+      toast.success("Login successful");
+      mutate("/auth/check-auth");
+      router.push("/dashboard");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Login failed";
+
+      toast.error(message);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
+      <Toaster />
       <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
         <CardHeader className="space-y-1 text-center">
           <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-linear-to-r from-primary to-primary/80 flex items-center justify-center">

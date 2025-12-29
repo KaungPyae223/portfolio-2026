@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -94,6 +95,10 @@ const PersonalInfo = () => {
               <FormControl>
                 <Input placeholder="shadcn" {...field} />
               </FormControl>
+              <FormDescription>
+                If you change the name, it will also change on the Hero
+                section's name
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

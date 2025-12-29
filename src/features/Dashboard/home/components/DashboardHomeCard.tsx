@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ButtonGroup } from "@/components/ui/button-group";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 interface HomeCardType {
   title: string;
@@ -37,6 +38,10 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({
   };
 
   const [devide, setDevide] = useState<keyof typeof devideInfo>("desktop");
+
+  const param = useSearchParams();
+
+  const language = param.get("language") || "English";
 
   return (
     <Card
@@ -107,7 +112,7 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({
           className={`${devideInfo[devide]}  dark:bg-gray-800 transform duration-300 relative  mx-auto rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 `}
         >
           <iframe
-            src={url + "?dark=" + isDark}
+            src={url + "?dark=" + isDark + "&language=" + language}
             className="absolute  inset-0 w-full h-full "
           />
         </div>

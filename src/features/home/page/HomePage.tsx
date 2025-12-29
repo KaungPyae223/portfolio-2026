@@ -1,5 +1,4 @@
 "use client";
-import React, { useEffect, useRef } from "react";
 import Container from "@/features/global/components/Container";
 import HomeHeroSection from "@/features/home/components/HomeHeroSection";
 import HomePersonalInfo from "@/features/home/components/HomePersonalInfo";
@@ -8,18 +7,63 @@ import HomeSkills from "@/features/home/components/HomeSkills";
 import HomeProjectDetails from "../components/HomeProjectDetails";
 import HomeContact from "../components/HomeContact";
 import HomeCertificates from "../components/HomeCertificates";
+import useSWR from "swr";
+import { fetcher } from "@/services/fetcher";
+import Loading from "@/features/global/components/Loading";
+import { useSearchParams } from "next/navigation";
 
 const HomePage = () => {
+  const param = useSearchParams();
+
+  const language = param.get("language") || "English";
+
+  const { data, error, isLoading } = useSWR(
+    `/user-side/home?language=${language}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+    }
+  );
+
+  console.log(data);
+
+  if (isLoading) return <Loading />;
+  if (error) return <div>Error: {error.message}</div>;
+
   return (
     <>
       <HomeProjectDetails />
       <Container>
-        <HomeHeroSection />
-        <HomePersonalInfo />
+        <HomeHeroSection
+          prefix={data?.data.prefix}
+          name={data?.data.name}
+          title={data?.data.title}
+          content={data?.data.content}
+        />
+        <HomePersonalInfo
+          name={data?.data.name}
+          dob={data?.data.date_of_birth}
+          location={data?.data.location}
+          email={data?.data.email}
+          phone={data?.data.phone}
+          educations={data?.data.educations}
+          experiences={data?.data.experiences}
+        />
         <HomeSkills />
         <HomeProjects />
         <HomeCertificates />
-        <HomeContact />
+        <HomeContact
+          name={data?.data.name}
+          phone={data?.data.phone}
+          title={data?.data.title}
+          location={data?.data.location}
+          email={data?.data.email}
+          github={data?.data.github}
+          linkedin={data?.data.linkedin}
+          facebook={data?.data.facebook}
+        />
       </Container>
     </>
   );
