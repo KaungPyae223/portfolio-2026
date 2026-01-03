@@ -6,25 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import {
-  Item,
-  ItemActions,
-  ItemContent,
-  ItemDescription,
-  ItemTitle,
-} from "@/components/ui/item";
 import PersonalInfo from "./PersonalManagement/PersonalInfo";
 import EducationInfo from "./PersonalManagement/EducationInfo";
 import ExperienceInfo from "./PersonalManagement/ExperienceInfo";
 import CVInfo from "./PersonalManagement/CVInfo";
 import ProfilePicture from "./PersonalManagement/ProfilePicture";
+import useSWR from "swr";
+import { fetcher } from "@/services/fetcher";
 
 const PersonalInfoManagementForm = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const { data, error, isLoading } = useSWR(
+    "/user-side/home?language=English",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
+
+  console.log(data);
 
   return (
     <div>
@@ -43,7 +44,7 @@ const PersonalInfoManagementForm = () => {
           </div>
 
           <div className="space-y-3">
-            <ProfilePicture />
+            <ProfilePicture profileURL={data?.data.profileURL} />
             <EducationInfo />
             <ExperienceInfo />
           </div>

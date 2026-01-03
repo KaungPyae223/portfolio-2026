@@ -1,7 +1,15 @@
 import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Upload, Camera, Trash2, User } from "lucide-react";
+import {
+  Upload,
+  Camera,
+  Trash2,
+  User,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import {
   Item,
   ItemActions,
@@ -9,49 +17,52 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
+import { api, formApi } from "@/services/api";
+import { mutate } from "swr";
+import { toast } from "sonner";
 
-interface ProfilePictureFile {
-  id: string;
-  name: string;
-  size: string;
-  uploadDate: string;
-  url: string;
-}
+import { Badge } from "@/components/ui/badge";
 
-const ProfilePicture = () => {
-  const [profilePicture, setProfilePicture] =
-    useState<ProfilePictureFile | null>(null);
+const ProfilePicture = ({ profileURL }: { profileURL: string }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (files: FileList | null) => {
+  const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
     const validTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!validTypes.includes(file.type)) {
-      alert("Please upload a JPEG, PNG, or WebP image");
+      toast.error("Please upload a JPEG, PNG, or WebP image");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB");
+      toast.error("File size must be less than 5MB");
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const newProfilePicture: ProfilePictureFile = {
-        id: Date.now().toString(),
-        name: file.name,
-        size: `${(file.size / 1024).toFixed(2)} KB`,
-        uploadDate: new Date().toLocaleDateString(),
-        url: e.target?.result as string,
-      };
-      setProfilePicture(newProfilePicture);
-    };
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+
+    try {
+      const form = new FormData();
+      form.set("image", file);
+
+      await formApi.patch("/home-management/upload-profile-image", form);
+
+      mutate("/user-side/home?language=Japanese");
+      mutate("/user-side/home?language=English");
+
+      toast.success("Profile picture uploaded successfully");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to upload image";
+      toast.error(message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -70,8 +81,28 @@ const ProfilePicture = () => {
     handleFileUpload(e.dataTransfer.files);
   };
 
-  const handleDelete = () => {
-    setProfilePicture(null);
+  const handleDelete = async () => {
+    if (
+      !window.confirm("Are you sure you want to delete your profile picture?")
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      await api.delete("/home-management/delete-profile-image");
+
+      mutate("/user-side/home?language=Japanese");
+      mutate("/user-side/home?language=English");
+
+      toast.success("Profile picture deleted successfully");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to delete image";
+      toast.error(message);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -86,29 +117,53 @@ const ProfilePicture = () => {
 
       {/* Current Profile Picture */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-700">Current Picture</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-gray-700">Current Picture</h3>
+          {profileURL && (
+            <Badge variant="outline" className="text-xs">
+              Active
+            </Badge>
+          )}
+        </div>
 
-        {profilePicture ? (
+        {profileURL ? (
           <Item
             variant="muted"
-            className="bg-linear-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors"
+            className="bg-linear-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-all duration-200"
           >
             <ItemContent className="flex-1">
               <div className="flex items-center gap-4">
-                <div className="relative">
+                <div className="relative group">
+                  {(isUploading || isDeleting) && (
+                    <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-purple-600" />
+                    </div>
+                  )}
                   <img
-                    src={profilePicture.url}
+                    src={profileURL}
                     alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-sm"
+                    className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105"
                   />
                 </div>
-                <div>
-                  <ItemTitle className="text-gray-900 font-semibold">
-                    {profilePicture.name}
-                  </ItemTitle>
-                  <ItemDescription className="text-gray-600 text-sm">
-                    {profilePicture.size} • Uploaded {profilePicture.uploadDate}
-                  </ItemDescription>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    {isUploading && (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        <span className="text-sm text-blue-600">
+                          Uploading...
+                        </span>
+                      </>
+                    )}
+                    {isDeleting && (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                        <span className="text-sm text-red-600">
+                          Deleting...
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </ItemContent>
@@ -118,15 +173,24 @@ const ProfilePicture = () => {
                 size="icon"
                 className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
                 onClick={handleDelete}
+                disabled={isUploading || isDeleting}
+                aria-label="Delete profile picture"
               >
-                <Trash2 className="h-4 w-4" />
+                {isDeleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </Button>
             </ItemActions>
           </Item>
         ) : (
-          <div className="text-center py-8 text-muted-foreground border-2 border-dashed border-gray-300 rounded-lg">
-            <User className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p>No profile picture uploaded</p>
+          <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <User className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+            <p className="text-gray-600 font-medium mb-1">No profile picture</p>
+            <p className="text-sm text-gray-500">
+              Upload a picture to personalize your profile
+            </p>
           </div>
         )}
       </div>
@@ -135,22 +199,53 @@ const ProfilePicture = () => {
       <div className="rounded-lg border border-gray-200 bg-linear-to-br from-gray-50 to-white p-6 space-y-4">
         <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
           <span className="w-1 h-4 bg-gray-500 rounded-full"></span>
-          {profilePicture ? "Change Profile Picture" : "Upload Profile Picture"}
+          {profileURL ? "Change Profile Picture" : "Upload Profile Picture"}
         </h3>
 
         <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 relative ${
             isDragging
-              ? "border-purple-400 bg-purple-50"
-              : "border-gray-300 hover:border-gray-400"
+              ? "border-purple-400 bg-purple-50 scale-[1.02]"
+              : isUploading
+              ? "border-blue-400 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          <Camera className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-sm text-gray-600 mb-2">
-            Drag and drop your picture here, or click to browse
+          {isUploading && (
+            <div className="absolute inset-0 bg-white bg-opacity-90 rounded-lg flex flex-col items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+              <p className="text-sm font-medium text-blue-600 mb-2">
+                Uploading picture...
+              </p>
+            </div>
+          )}
+
+          <Camera
+            className={`mx-auto h-12 w-12 mb-4 transition-colors ${
+              isUploading
+                ? "text-blue-400"
+                : isDragging
+                ? "text-purple-500"
+                : "text-gray-400"
+            }`}
+          />
+          <p
+            className={`text-sm mb-2 ${
+              isUploading
+                ? "text-blue-600"
+                : isDragging
+                ? "text-purple-600"
+                : "text-gray-600"
+            }`}
+          >
+            {isUploading
+              ? "Processing your image..."
+              : isDragging
+              ? "Drop your picture here"
+              : "Drag and drop your picture here, or click to browse"}
           </p>
           <p className="text-xs text-gray-500 mb-4">
             JPEG, PNG, or WebP (Max 5MB, Recommended: 400x400px)
@@ -159,9 +254,19 @@ const ProfilePicture = () => {
             variant="outline"
             onClick={() => fileInputRef.current?.click()}
             className="mb-2"
+            disabled={isUploading}
           >
-            <Camera className="mr-2 h-4 w-4" />
-            Choose Picture
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Camera className="mr-2 h-4 w-4" />
+                Choose Picture
+              </>
+            )}
           </Button>
           <input
             ref={fileInputRef}
@@ -171,8 +276,6 @@ const ProfilePicture = () => {
             className="hidden"
           />
         </div>
-
-       
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import {
   Github,
   Linkedin,
   Facebook,
+  User,
 } from "lucide-react";
 
 type HomeContractProps = {
@@ -20,9 +21,11 @@ type HomeContractProps = {
   linkedin: string;
   facebook: string;
   phone: string;
+  profileURL: string;
 };
 
 const HomeContact: React.FC<HomeContractProps> = ({
+  profileURL,
   name,
   title,
   location,
@@ -125,13 +128,20 @@ const HomeContact: React.FC<HomeContractProps> = ({
               {/* Personal Info Card */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-4 mb-6">
-                  <Image
-                    src="https://res.cloudinary.com/dzkoc2zf7/image/upload/v1746976058/cropped-Kaung_Pyae_Aung-removebg-preview_1_1_oefxf8.png"
-                    alt="Profile"
-                    width={600}
-                    height={600}
-                    className="w-16 h-16 rounded-full"
-                  />
+                  {profileURL ? (
+                    <Image
+                      src={profileURL}
+                      alt="Profile"
+                      width={600}
+                      height={600}
+                      className="w-16 h-16 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center">
+                      <User className="size-6" />
+                    </div>
+                  )}
+
                   <div>
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
                       {name}

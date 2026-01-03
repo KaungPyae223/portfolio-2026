@@ -18,22 +18,30 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import HomeHeroManagementPreview from "./HomeHeroManagementPreview";
 import Link from "next/link";
 import { ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/services/fetcher";
+import { api } from "@/services/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   github: z
     .string()
     .min(2, { message: "github is required" })
-    .max(4, { message: "github is too long" }),
+    .max(50, { message: "github is too long" }),
   facebook: z
     .string()
     .min(2, { message: "facebook is required" })
     .max(50, { message: "facebook is too long" }),
+  phone: z
+    .string()
+    .min(2, { message: "phone is required" })
+    .max(50, { message: "phone is too long" }),
   linkedin: z
     .string()
     .min(2, { message: "linkedin is required" })
@@ -45,9 +53,15 @@ const formSchema = z.object({
 });
 
 const HomeContactManagementForm = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const { data, error, isLoading } = useSWR(
+    "/user-side/home?language=English",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
 
-  // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,14 +69,39 @@ const HomeContactManagementForm = () => {
       facebook: "",
       linkedin: "",
       email: "",
+      phone: "",
     },
   });
 
+  useEffect(() => {
+    if (isLoading) return;
+
+    form.setValue("email", data?.data.email);
+    form.setValue("github", data?.data.github);
+    form.setValue("facebook", data?.data.facebook);
+    form.setValue("linkedin", data?.data.linkedin);
+    form.setValue("phone", data?.data.phone);
+  }, [data, isLoading]);
+
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await api.put("/home-management/meta-manage", {
+        email: values.email,
+        github: values.github,
+        facebook: values.facebook,
+        linkedin: values.linkedin,
+        phone: values.phone,
+      });
+      mutate("/user-side/home?language=Japanese");
+      mutate("/user-side/home?language=English");
+
+      toast.success("Updated successfully");
+      // router.push("/dashboard/home");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   }
 
   return (
@@ -137,6 +176,20 @@ const HomeContactManagementForm = () => {
                     <FormLabel>Linkedin</FormLabel>
                     <FormControl>
                       <Input placeholder="Linkedin URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Phone Number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

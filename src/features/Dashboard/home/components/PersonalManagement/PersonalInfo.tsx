@@ -10,11 +10,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/services/fetcher";
+import { api } from "@/services/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   name: z
@@ -40,21 +44,62 @@ const formSchema = z.object({
 });
 
 const PersonalInfo = () => {
+  const { data, error, isLoading } = useSWR(
+    "/home-management/get-all-home",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
+
+  const [activeTab, setActiveTab] = useState("English");
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "Kaung Pyae Aung",
-      dob: "Full stack web developer",
-      location: "Full stack web developer",
-      email: "Full stack web developer",
-      phone: "Full stack web developer",
+      name: "",
+      dob: "",
+      location: "",
+      email: "",
+      phone: "",
     },
   });
 
+  useEffect(() => {
+    if (isLoading) return;
+
+    const selectedData = data?.data.find(
+      (item: any) => item.language === activeTab
+    );
+
+    form.setValue("name", selectedData?.name);
+    form.setValue("dob", selectedData?.date_of_birth);
+    form.setValue("location", selectedData?.location);
+    form.setValue("email", selectedData?.email);
+    form.setValue("phone", selectedData?.phone);
+  }, [data, activeTab, isLoading]);
+
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await api.put("/home-management/about-manage", {
+        language: activeTab,
+        name: values.name,
+        date_of_birth: values.dob,
+        email: values.email,
+        location: values.location,
+        phone: values.phone,
+      });
+      mutate("/home-management/get-all-home");
+      mutate("/user-side/home?language=" + activeTab);
+      toast.success("Updated successfully");
+      // router.push("/dashboard/home");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   }
 
   return (
@@ -73,13 +118,30 @@ const PersonalInfo = () => {
 
         {/* Language Tabs */}
         <div className="inline-flex rounded-lg bg-gray-100 p-1">
-          <button className="rounded-md bg-white px-4 py-1.5 text-sm font-medium shadow">
-            Myanmar
-          </button>
-          <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("English");
+            }}
+            className={`${
+              activeTab == "English"
+                ? "bg-white shadow font-medium"
+                : "text-gray-600 hover:text-black"
+            } rounded-md px-4 py-1.5 text-sm `}
+          >
             English
           </button>
-          <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("Japanese");
+            }}
+            className={`${
+              activeTab == "Japanese"
+                ? "bg-white shadow font-medium"
+                : "text-gray-600 hover:text-black"
+            } rounded-md px-4 py-1.5 text-sm `}
+          >
             Japanese
           </button>
         </div>

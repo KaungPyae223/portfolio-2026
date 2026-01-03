@@ -26,6 +26,7 @@ type HomePersonalInfoProps = {
   phone: string;
   educations: any[];
   experiences: any[];
+  profileURL: string;
 };
 
 const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
@@ -36,6 +37,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
   phone,
   educations,
   experiences,
+  profileURL,
 }) => {
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -76,19 +78,25 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
             viewport={{ once: true, amount: 0.3 }}
           >
             <div className="relative flex justify-center lg:col-span-1 order-1 lg:order-1">
-              <div className="relative">
+              <div className="relative w-[75%]">
                 {/* Decorative arch background */}
                 <div className="absolute inset-0 bg-linear-to-br from-yellow-100 to-yellow-50 dark:from-yellow-900/20 dark:to-yellow-800/10 rounded-[3rem] transform rotate-6 scale-110"></div>
 
                 {/* Profile image */}
                 <div className="relative z-10 rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white dark:border-gray-800">
-                  <Image
-                    src="https://res.cloudinary.com/dzkoc2zf7/image/upload/v1746976058/cropped-Kaung_Pyae_Aung-removebg-preview_1_1_oefxf8.png"
-                    alt="Profile"
-                    width={600}
-                    height={600}
-                    className="w-full h-full object-cover"
-                  />
+                  {profileURL ? (
+                    <Image
+                      src={profileURL}
+                      alt="Profile"
+                      width={600}
+                      height={600}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center p-16 justify-center">
+                      <User className="size-16" />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

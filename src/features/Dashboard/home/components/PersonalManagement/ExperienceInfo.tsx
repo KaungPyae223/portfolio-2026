@@ -20,10 +20,15 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Trash, Briefcase } from "lucide-react";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/services/fetcher";
+import Loading from "@/features/global/components/Loading";
+import { api } from "@/services/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  position: z
+  title: z
     .string()
     .min(2, { message: "position is required" })
     .max(50, { message: "position is too long" }),
@@ -34,18 +39,58 @@ const formSchema = z.object({
 });
 
 const ExperienceInfo = () => {
+  const { data, error, isLoading } = useSWR(
+    "/user-side/home?language=English",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      position: "",
+      title: "",
       year: "",
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await api.post("/home-management/experience-manage", {
+        title: values.title,
+        description: values.year,
+      });
+      mutate("/user-side/home?language=English");
+      mutate("/user-side/home?language=Japanese");
+      form.reset();
+      toast.success("Expereince created successfully");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  }
+
+  const deleteExperience = async (id: string) => {
+    if (window.confirm("Are you sure to delete")) {
+      try {
+        await api.delete("/home-management/experience-manage/" + id);
+        mutate("/user-side/home?language=English");
+        mutate("/user-side/home?language=Japanese");
+        form.reset();
+        toast.success("Expereince deleted successfully");
+      } catch (error: any) {
+        const message = error.response?.data?.message || "Something went wrong";
+        toast.error(message);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (
@@ -68,28 +113,48 @@ const ExperienceInfo = () => {
             Added Experience
           </h3>
 
-          <Item
-            variant="muted"
-            className="bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300 transition-colors"
-          >
-            <ItemContent className="flex-1">
-              <ItemTitle className="text-gray-900 font-semibold">
-                Senior Frontend Developer
-              </ItemTitle>
-              <ItemDescription className="text-gray-600 text-sm">
-                Tech Company Inc.
-              </ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Button
-                variant="outline"
-                size="icon"
-                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+          {data?.data.experiences?.length > 0 ? (
+            data?.data.experiences.map((experience: any) => (
+              <Item
+                variant="muted"
+                key={experience.id}
+                className="bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300 transition-colors"
               >
-                <Trash className="h-4 w-4" />
-              </Button>
-            </ItemActions>
-          </Item>
+                <ItemContent className="flex-1">
+                  <ItemTitle className="text-gray-900 font-semibold">
+                    {experience.title}
+                  </ItemTitle>
+                  <ItemDescription className="text-gray-600 text-sm">
+                    {experience.description}
+                  </ItemDescription>
+                </ItemContent>
+                <ItemActions>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    type="button"
+                    className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+                    onClick={() => deleteExperience(experience.id)}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </ItemActions>
+              </Item>
+            ))
+          ) : (
+            <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+              <Briefcase className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No experience added yet
+              </h3>
+              <p className="text-sm text-gray-500 mb-4">
+                Start building your profile by adding your work experience
+              </p>
+              <p className="text-xs text-gray-400">
+                Use the form below to add your first experience
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Add New Experience Form */}
@@ -102,11 +167,11 @@ const ExperienceInfo = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <FormField
               control={form.control}
-              name="position"
+              name="title"
               render={({ field }) => (
                 <FormItem className="col-span-2">
                   <FormLabel className="text-sm font-medium text-gray-700">
-                    Position
+                    Title
                   </FormLabel>
                   <FormControl>
                     <Input

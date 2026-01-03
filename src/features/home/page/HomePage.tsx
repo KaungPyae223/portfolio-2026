@@ -50,11 +50,13 @@ const HomePage = () => {
           phone={data?.data.phone}
           educations={data?.data.educations}
           experiences={data?.data.experiences}
+          profileURL={data?.data.profileURL}
         />
         <HomeSkills />
         <HomeProjects />
         <HomeCertificates />
         <HomeContact
+          profileURL={data?.data.profileURL}
           name={data?.data.name}
           phone={data?.data.phone}
           title={data?.data.title}

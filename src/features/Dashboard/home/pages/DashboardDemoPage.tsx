@@ -47,6 +47,7 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
     ),
     homePersonalInfo: (
       <HomePersonalInfo
+        profileURL={data?.data.profileURL}
         name={data?.data.name}
         dob={data?.data.date_of_birth}
         location={data?.data.location}
@@ -59,6 +60,7 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
     homeSkills: <HomeSkills />,
     homeContact: (
       <HomeContact
+        profileURL={data?.data.profileURL}
         name={data?.data.name}
         phone={data?.data.phone}
         title={data?.data.title}

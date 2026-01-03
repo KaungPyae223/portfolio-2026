@@ -70,8 +70,6 @@ const HomeHeroManagementForm = () => {
     },
   });
 
-  const router = useRouter();
-
   useEffect(() => {
     if (isLoading) return;
 
@@ -131,8 +129,8 @@ const HomeHeroManagementForm = () => {
               {/* Language Tabs */}
               <div className="inline-flex rounded-lg bg-gray-100 p-1">
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
+                  type="button"
+                  onClick={() => {
                     setActiveTab("English");
                   }}
                   className={`${
@@ -144,8 +142,8 @@ const HomeHeroManagementForm = () => {
                   English
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
+                  type="button"
+                  onClick={() => {
                     setActiveTab("Japanese");
                   }}
                   className={`${
