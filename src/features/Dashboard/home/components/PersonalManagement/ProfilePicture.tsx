@@ -83,7 +83,7 @@ const ProfilePicture = ({ profileURL }: { profileURL: string }) => {
 
   const handleDelete = async () => {
     if (
-      !window.confirm("Are you sure you want to delete your profile picture?")
+      !window.confirm("Are you sure you want to delete your cv?")
     ) {
       return;
     }

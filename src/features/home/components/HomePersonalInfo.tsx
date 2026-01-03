@@ -27,6 +27,7 @@ type HomePersonalInfoProps = {
   educations: any[];
   experiences: any[];
   profileURL: string;
+  cvURL: string;
 };
 
 const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
@@ -38,6 +39,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
   educations,
   experiences,
   profileURL,
+  cvURL,
 }) => {
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -65,6 +67,18 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
 
     return () => ctx.revert();
   }, []);
+
+  const downloadCV = async (url: string, filename = name + " cv.pdf") => {
+    const res = await fetch(url);
+    const blob = await res.blob();
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
@@ -229,16 +243,15 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                 </div>
               </div>
 
-              {/* CTA Button */}
-              <Link
-                href={
-                  "https://drive.google.com/file/d/1M81-zCYb8K5r5W-jUa7XeWvkae1G6r6h/view?usp=sharing"
-                }
-                className="group inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                <Download className="w-5 h-5 group-hover:animate-bounce" />
-                Download CV
-              </Link>
+              {cvURL ? (
+                <div
+                  onClick={() => downloadCV(cvURL)}
+                  className="group inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                  <Download className="w-5 h-5 group-hover:animate-bounce" />
+                  Download CV
+                </div>
+              ) : null}
             </div>
           </motion.div>
         </div>

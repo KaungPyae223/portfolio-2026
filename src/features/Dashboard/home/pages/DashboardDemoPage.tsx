@@ -55,6 +55,7 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
         phone={data?.data.phone}
         educations={data?.data.educations}
         experiences={data?.data.experiences}
+        cvURL={data?.data.cvURL}
       />
     ),
     homeSkills: <HomeSkills />,

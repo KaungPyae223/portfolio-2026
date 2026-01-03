@@ -39,7 +39,7 @@ const PersonalInfoManagementForm = () => {
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-3">
           <div className="space-y-3">
-            <CVInfo />
+            <CVInfo cvURL={data?.data.cvURL} />
             <PersonalInfo />
           </div>
 
