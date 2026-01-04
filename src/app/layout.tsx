@@ -1,6 +1,6 @@
 // src/app/(index)/layout.tsx
-import NavBar from "@/features/global/components/Nav";
 import "./globals.css";
+import { NextIntlClientProvider } from "next-intl";
 
 export default async function RootLayout({
   children,
@@ -9,7 +9,9 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="dark:bg-gray-900 bg-white transition-colors duration-300">{children}</body>
+      <body className="dark:bg-gray-900 bg-white transition-colors duration-300">
+        {children}
+      </body>
     </html>
   );
 }

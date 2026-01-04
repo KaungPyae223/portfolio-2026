@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import {
   Home,
@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useLocale, useTranslations } from "next-intl";
 
 interface NavLink {
   name: string;
@@ -35,50 +36,35 @@ interface NavLink {
   icon: LucideIcon;
 }
 
-const navLinks: NavLink[] = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "Projects", href: "/projects", icon: FolderKanban },
-  { name: "About", href: "/about", icon: User },
-  { name: "Certificates", href: "/certificates", icon: Award },
-];
-
 const languages = [
   { code: "en", label: "English" },
-  { code: "my", label: "မြန်မာ" },
-  { code: "ja", label: "日本語" },
+  { code: "jp", label: "日本語" },
 ];
 
-const HomeNav = () => {
+const HomeNav = ({
+  currentLanguage,
+  darkMode,
+  toggleDarkMode,
+}: {
+  currentLanguage: any;
+  darkMode: boolean;
+  toggleDarkMode: () => void;
+}) => {
+  const t = useTranslations("navigation");
+
+  const navLinks: NavLink[] = [
+    { name: t("home"), href: "/", icon: Home },
+    { name: t("projects"), href: "/projects", icon: FolderKanban },
+    { name: t("about"), href: "/about", icon: User },
+    { name: t("certificates"), href: "/certificates", icon: Award },
+  ];
+
   const pathname = usePathname();
-  const [darkMode, setDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState("en");
 
-  // Sync initial state from localStorage
-  useEffect(() => {
-    const storedTheme = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const initialMode = storedTheme || (prefersDark ? "dark" : "light");
+  const router = useRouter();
 
-    setDarkMode(initialMode === "dark");
-
-    // Load saved language
-    const storedLang = localStorage.getItem("language") || "en";
-    setCurrentLanguage(storedLang);
-  }, []);
-
-  const toggleDarkMode = () => {
-    const newMode = !darkMode ? "dark" : "light";
-    setDarkMode(!darkMode);
-    localStorage.setItem("theme", newMode);
-    document.documentElement.classList.toggle("dark", newMode === "dark");
-  };
-
-  const handleLanguageChange = (value: string) => {
-    setCurrentLanguage(value);
-    localStorage.setItem("language", value);
-    // Add your actual language change logic here
+  const handleLanguageChange = (language: string) => {
+    router.replace(pathname, { locale: language });
   };
 
   return (
@@ -86,7 +72,7 @@ const HomeNav = () => {
       <div className="h-full flex flex-col">
         <DrawerHeader className="border-b border-gray-200 dark:border-gray-700">
           <DrawerTitle className="text-gray-900 dark:text-gray-100">
-            Menu
+            {t("menu")}
           </DrawerTitle>
         </DrawerHeader>
 
@@ -123,7 +109,7 @@ const HomeNav = () => {
           {/* Settings Section */}
           <div className="space-y-3">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2">
-              Settings
+              {t("setting")}
             </p>
 
             {/* Dark Mode Toggle */}
@@ -150,11 +136,11 @@ const HomeNav = () => {
               <div className="flex items-center gap-2 mb-2">
                 <Globe className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Language
+                  {t("languages")}
                 </span>
               </div>
               <Select
-                value={currentLanguage}
+                value={currentLanguage.code}
                 onValueChange={handleLanguageChange}
               >
                 <SelectTrigger className="w-full">

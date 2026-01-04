@@ -11,11 +11,14 @@ import useSWR from "swr";
 import { fetcher } from "@/services/fetcher";
 import Loading from "@/features/global/components/Loading";
 import { useSearchParams } from "next/navigation";
+import { useLocale } from "next-intl";
 
 const HomePage = () => {
   const param = useSearchParams();
 
-  const language = param.get("language") || "English";
+  const locale = useLocale();
+
+  const language = locale == "en" ? "English" : "Japanese";
 
   const { data, error, isLoading } = useSWR(
     `/user-side/home?language=${language}`,
@@ -26,8 +29,6 @@ const HomePage = () => {
       revalidateIfStale: false,
     }
   );
-
-  console.log(data);
 
   if (isLoading) return <Loading />;
   if (error) return <div>Error: {error.message}</div>;

@@ -34,7 +34,7 @@ const HomeCertificateCard = ({
 
   return (
     <motion.div variants={certificateVariants}>
-       <div className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 shadow-lg hover:shadow-2xl  transition-all duration-300 cursor-pointer">
+      <div className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 shadow-lg hover:shadow-2xl  transition-all duration-300 cursor-pointer">
         {/* Certificate Image */}
         <div className="relative h-[200px] overflow-hidden bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800">
           <div className="absolute inset-0 flex items-center justify-center">

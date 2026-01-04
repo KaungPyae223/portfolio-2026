@@ -19,8 +19,11 @@ import {
   GitMerge,
   Coffee,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 const HomeSkills = () => {
+  const t = useTranslations("home");
+
   const allSkills = [
     { name: "React", icon: <Code className="w-8 h-8" />, level: 90 },
     { name: "Next.js", icon: <Globe className="w-8 h-8" />, level: 85 },
@@ -97,9 +100,9 @@ const HomeSkills = () => {
         >
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold flex flex-wrap items-center justify-center gap-3 text-gray-900 dark:text-white">
-              My
+              {t("my")}
               <span className="bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 p-1.5 rounded-md">
-                Skills
+                {t("skills")}
               </span>
             </h2>
           </div>

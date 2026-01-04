@@ -11,6 +11,7 @@ import {
   Facebook,
   User,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type HomeContractProps = {
   name: string;
@@ -35,6 +36,8 @@ const HomeContact: React.FC<HomeContractProps> = ({
   facebook,
   phone,
 }) => {
+  const t = useTranslations("home");
+
   const leftVariants = {
     hidden: {
       x: -100,
@@ -92,12 +95,12 @@ const HomeContact: React.FC<HomeContractProps> = ({
           >
             <div className="mb-8">
               <h2 className="text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-                Get in touch
+                {t("get_in_touch")}
                 <span className="block text-yellow-500 dark:text-yellow-400">
-                  with me
+                  {t("with_me")}
                 </span>
                 <span className="p-3 inline-block px-6 mt-3 font-medium rounded-xl bg-yellow-300 dark:bg-yellow-500/20 dark:text-yellow-300">
-                  Anytime
+                  {t("anytime")}
                 </span>
               </h2>
             </div>
@@ -106,9 +109,7 @@ const HomeContact: React.FC<HomeContractProps> = ({
               <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
                 <Mail className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
               </div>
-              <p className="text-lg">
-                Always open to discuss new opportunities
-              </p>
+              <p className="text-lg">{t("always_open")}</p>
             </div>
           </motion.div>
 
@@ -122,7 +123,7 @@ const HomeContact: React.FC<HomeContractProps> = ({
           >
             <motion.div variants={itemVariants}>
               <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                Contact Information
+                {t("contact_info")}
               </h3>
 
               {/* Personal Info Card */}
@@ -175,7 +176,7 @@ const HomeContact: React.FC<HomeContractProps> = ({
                   <div className="flex items-center gap-3 group">
                     <Calendar className="w-5 h-5 text-yellow-500 dark:text-yellow-400 group-hover:scale-110 transition-transform" />
                     <span className="text-gray-700 dark:text-gray-300">
-                      Open for new projects and collaborations
+                      {t("open")}
                     </span>
                   </div>
                 </div>
@@ -184,7 +185,7 @@ const HomeContact: React.FC<HomeContractProps> = ({
               {/* Social Media */}
               <motion.div variants={itemVariants}>
                 <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Connect With Me
+                  {t("connect_with_me")}
                 </h4>
                 <div className="flex gap-4">
                   <a

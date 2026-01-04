@@ -16,6 +16,7 @@ import {
   Download,
   User,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 gsap.registerPlugin(ScrollTrigger);
 
 type HomePersonalInfoProps = {
@@ -41,6 +42,8 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
   profileURL,
   cvURL,
 }) => {
+  const t = useTranslations("home");
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
@@ -83,7 +86,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
       <div className="relative z-10 container mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-3 gap-12 items-center">
+        <div className="grid xl:grid-cols-3 gap-12 items-center">
           {/* Left Column - Profile Image */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -116,7 +119,6 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
             </div>
           </motion.div>
 
-          {/* Center Column - Personal Information */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -126,9 +128,9 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
             <div className="space-y-8 lg:col-span-1 order-3 lg:order-2">
               <div className="text-center space-y-4">
                 <h2 className="text-3xl font-bold flex flex-wrap items-center justify-center gap-3 text-gray-900 dark:text-white">
-                  My short{" "}
+                  {t("my_short")}{" "}
                   <span className="bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 p-1.5 rounded-md ">
-                    Personal Information
+                    {t("personal_info")}
                   </span>
                 </h2>
               </div>
@@ -139,7 +141,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                     <User className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Name
+                        {t("name")}
                       </p>
                       <p className="font-medium">{name}</p>
                     </div>
@@ -148,7 +150,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                     <Calendar className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Date of Birth
+                        {t("dob")}
                       </p>
                       <p className="font-medium">{dob}</p>
                     </div>
@@ -157,7 +159,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                     <MapPin className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Location
+                        {t("location")}
                       </p>
                       <p className="font-medium">{location}</p>
                     </div>
@@ -166,7 +168,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                     <Mail className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Email
+                        {t("email")}
                       </p>
                       <p className="font-medium">{email}</p>
                     </div>
@@ -175,7 +177,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                     <Phone className="w-5 h-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Phone
+                        {t("phone")}
                       </p>
                       <p className="font-medium">{phone}</p>
                     </div>
@@ -198,7 +200,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                 <div className="flex items-center gap-3 mb-4">
                   <GraduationCap className="w-6 h-6 text-yellow-600 dark:text-yellow-400 shrink-0" />
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Education
+                    {t("education")}
                   </h3>
                 </div>
                 <div className="space-y-3">
@@ -223,7 +225,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                 <div className="flex items-center gap-3 mb-4">
                   <Briefcase className="w-6 h-6 text-yellow-600 dark:text-yellow-400 shrink-0" />
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                    Experience
+                    {t("experience")}
                   </h3>
                 </div>
                 <div className="space-y-3">
@@ -249,7 +251,7 @@ const HomePersonalInfo: React.FC<HomePersonalInfoProps> = ({
                   className="group inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   <Download className="w-5 h-5 group-hover:animate-bounce" />
-                  Download CV
+                  {t("downlaod_cv")}
                 </div>
               ) : null}
             </div>

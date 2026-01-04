@@ -4,32 +4,32 @@ import { Sun, Moon, Globe, ChevronDown, MenuIcon } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation"; // Import from next-intl
+import { useLocale, useTranslations } from "next-intl";
 
-import {
-  Drawer,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Button } from "@/components/ui/button";
+import { Drawer, DrawerTrigger } from "@/components/ui/drawer";
 import HomeNav from "./HomeNav";
-
-const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "Projects", href: "/projects" },
-  { name: "About", href: "/about" },
-  { name: "Certificates", href: "/certificates" },
-];
 
 const languages = [
   { code: "en", label: "English" },
-  { code: "my", label: "မြန်မာ" },
-  { code: "ja", label: "日本語" },
+  { code: "jp", label: "日本語" },
 ];
 
 const NavBar = () => {
+  const locale = useLocale();
+  const t = useTranslations("navigation");
+
+  const navLinks = [
+    { name: t("home"), href: "/" },
+    { name: t("projects"), href: "/projects" },
+    { name: t("about"), href: "/about" },
+    { name: t("certificates"), href: "/certificates" },
+  ];
+
   const pathname = usePathname();
-  const [darkMode, setDarkMode] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState(languages[0]);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const currentLanguage =
+    languages.find((lang) => lang.code === locale) || languages[0];
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
 
   const navRef = useRef<HTMLDivElement>(null);
@@ -50,11 +50,6 @@ const NavBar = () => {
     document.documentElement.classList.toggle("dark", initialMode === "dark");
 
     // Load saved language
-    const storedLang = localStorage.getItem("language");
-    if (storedLang) {
-      const lang = languages.find((l) => l.code === storedLang);
-      if (lang) setCurrentLanguage(lang);
-    }
   }, []);
 
   // Close language menu when clicking outside
@@ -119,11 +114,11 @@ const NavBar = () => {
     document.documentElement.classList.toggle("dark", newMode === "dark");
   };
 
+  const router = useRouter();
+
   const handleLanguageChange = (language: (typeof languages)[0]) => {
-    setCurrentLanguage(language);
-    localStorage.setItem("language", language.code);
     setIsLanguageMenuOpen(false);
-    // Add your actual language change logic here
+    router.replace(pathname, { locale: language.code });
   };
 
   return (
@@ -134,7 +129,11 @@ const NavBar = () => {
             <MenuIcon />
           </div>
         </DrawerTrigger>
-         <HomeNav />
+        <HomeNav
+          currentLanguage={currentLanguage}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+        />
       </Drawer>
 
       <div
@@ -143,7 +142,7 @@ const NavBar = () => {
       >
         <div className="bg-white dark:bg-gray-800 border border-white/50 shadow-lg p-3 rounded-full flex items-center gap-5 transition-colors">
           <p className="font-medium px-5 text-lg hidden lg:block text-gray-800 dark:text-gray-100">
-            Kaung Pyae&apos;s portfolio
+            {t("portfolioTitle")}
           </p>
           <div className="border-e border-gray-300 dark:border-gray-600 h-full hidden lg:block" />
 

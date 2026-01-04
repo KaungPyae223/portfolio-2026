@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import { ExternalLink, Github, Code, Smartphone, Globe } from "lucide-react";
 import Image from "next/image";
 import ProjectCard from "./HomeProjectCard";
+import { useTranslations } from "next-intl";
 
 const HomeProjects = () => {
+  const t = useTranslations("home");
+
   const titleVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -87,9 +90,9 @@ const HomeProjects = () => {
         >
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold flex flex-wrap items-center justify-center gap-3 text-gray-900 dark:text-white">
-              My
+              {t("my")}
               <span className="bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 p-1.5 rounded-md">
-                Projects
+                {t("projects")}
               </span>
             </h2>
           </div>
@@ -120,7 +123,7 @@ const HomeProjects = () => {
               href="#"
               className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white dark:text-gray-800 font-medium rounded-full transition-all duration-300"
             >
-              View All Projects
+              {t("view_all_projects")}
             </a>
           </div>
         </motion.div>

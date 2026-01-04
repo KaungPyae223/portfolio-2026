@@ -2,8 +2,11 @@
 import React from "react";
 import { motion } from "framer-motion";
 import CertificateCard from "./HomeCertificateCard";
+import { useTranslations } from "next-intl";
 
 const HomeCertificates = () => {
+  const t = useTranslations("home");
+
   const titleVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -92,9 +95,9 @@ const HomeCertificates = () => {
         >
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold flex flex-wrap items-center justify-center gap-3 text-gray-900 dark:text-white">
-              My Professional
+              {t("my_professional")}
               <span className="bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900 p-1.5 rounded-md">
-                Certificates
+                {t("certificates")}
               </span>
             </h2>
           </div>
@@ -133,7 +136,7 @@ const HomeCertificates = () => {
               href="#"
               className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white dark:text-gray-800 font-medium rounded-full transition-all duration-300"
             >
-              View All Certificates
+              {t("view_all_certificates")}
             </a>
           </div>
         </motion.div>

@@ -1,0 +1,46 @@
+{
+  "Metadata": {
+    "title": "Kaung Pyae ポートフォリオ",
+    "description": "フルスタックデベロッパーのポートフォリオサイト"
+  },
+
+  "navigation": {
+    "portfolioTitle": "Kaung Pyae のポートフォリオ",
+    "home": "ホーム",
+    "projects": "プロジェクト",
+    "about": "プロフィール",
+    "certificates": "認定証",
+    "menu": "Menu",
+    "setting": "Settings",
+    "languages": "Languages"
+  },
+
+  "home": {
+    "about_me": "私について",
+    "view_my_projects": "プロジェクトを見る",
+    "my_short": "自己紹介",
+    "personal_info": "プロフィール情報",
+    "name": "名前",
+    "dob": "生年月日",
+    "location": "所在地",
+    "email": "メールアドレス",
+    "phone": "電話番号",
+    "education": "学歴",
+    "experience": "経験",
+    "downlaod_cv": "履歴書をダウンロード",
+    "my": "私の",
+    "skills": "スキル",
+    "projects": "プロジェクト",
+    "view_all_projects": "すべてのプロジェクトを見る",
+    "my_professional": "私の実績",
+    "certificates": "認定証",
+    "view_all_certificates": "すべての認定証を見る",
+    "get_in_touch": "お問い合わせ",
+    "with_me": "お気軽に",
+    "anytime": "いつでも",
+    "always_open": "新しい機会について常に歓迎しています",
+    "contact_info": "連絡先情報",
+    "connect_with_me": "私とつながる",
+    "open": "新しいプロジェクトやコラボレーションを受け付けています"
+  }
+}

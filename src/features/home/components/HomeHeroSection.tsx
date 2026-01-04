@@ -5,6 +5,7 @@ import { Database, Layers, User } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 type HomeHeroSectionProps = {
   prefix: string;
@@ -19,6 +20,8 @@ const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
   title,
   content,
 }) => {
+  const t = useTranslations("home");
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.set(".name", { opacity: 0, y: 50 });
@@ -152,7 +155,7 @@ const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
           >
             <User className="mr-2" />
           </motion.div>
-          About Me
+          {t("about_me")}
         </Link>
         <Link
           href={"/"}
@@ -173,7 +176,7 @@ const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
           >
             <Layers className="mr-2" />
           </motion.div>
-          View My Projects
+          {t("view_my_projects")}
         </Link>
       </div>
     </section>

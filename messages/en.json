@@ -1,0 +1,46 @@
+{
+  "Metadata": {
+    "title": "Kaung Pyae Portfolio",
+    "description": "Full stack developer's portfolio website"
+  },
+
+  "navigation": {
+    "portfolioTitle": "Kaung Pyae's portfolio",
+    "home": "Home",
+    "projects": "Projects",
+    "about": "About",
+    "certificates": "Certificates",
+    "menu": "Menu",
+    "setting": "Settings",
+    "languages": "Languages"
+  },
+
+  "home": {
+    "about_me": "About Me",
+    "view_my_projects": "View My Projects",
+    "my_short": "My Short",
+    "personal_info": "Personal Information",
+    "name": "Name",
+    "dob": "Date of Birth",
+    "location": "Location",
+    "email": "Email",
+    "phone": "Phone",
+    "education": "Education",
+    "experience": "Experience",
+    "downlaod_cv": "Download CV",
+    "my": "My",
+    "skills": "Skills",
+    "projects": "Projects",
+    "view_all_projects": "View All Projects",
+    "my_professional": "My Professional",
+    "certificates": "Certificates",
+    "view_all_certificates": "View All Certificates",
+    "get_in_touch": "Get in touch",
+    "with_me": "with me",
+    "anytime": "Anytime",
+    "always_open": "Always open to discuss new opportunities",
+    "contact_info": "Contact Information",
+    "connect_with_me": "Connect With Me",
+    "open": "Open for new projects and collaborations"
+  }
+}
