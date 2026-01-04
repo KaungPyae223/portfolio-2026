@@ -168,186 +168,28 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
       </div>
 
       {/* Japanese CV */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            🇯🇵 Japanese CV
-          </h3>
-          {japaneseCV?.url && (
-            <Badge variant="outline" className="text-xs">
-              Active
-            </Badge>
-          )}
-        </div>
 
-        {japaneseCV?.url ? (
-          <Item
-            variant="muted"
-            className="bg-linear-to-r from-red-50 to-pink-50 border-red-200 hover:border-red-300 transition-all duration-200"
-          >
-            <ItemContent className="flex-1">
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  {(isUploading.Japanese || isDeleting.Japanese) && (
-                    <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-red-600" />
-                    </div>
-                  )}
-                  <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-red-100 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-red-600" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    {isUploading.Japanese && (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                        <span className="text-sm text-blue-600">
-                          Uploading...
-                        </span>
-                      </>
-                    )}
-                    {isDeleting.Japanese && (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-red-600" />
-                        <span className="text-sm text-red-600">
-                          Deleting...
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </ItemContent>
-            <ItemActions className="flex gap-2">
-              <Button
-                onClick={() => downloadCV(japaneseCV?.url!, "Japanese-cv.pdf")}
-                variant="outline"
-                size="icon"
-                className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
-                disabled={isUploading.Japanese || isDeleting.Japanese}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
-                onClick={() => handleDelete("Japanese")}
-                disabled={isUploading.Japanese || isDeleting.Japanese}
-                aria-label="Delete Japanese CV"
-              >
-                {isDeleting.Japanese ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
-            </ItemActions>
-          </Item>
-        ) : (
-          <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-            <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-            <p className="text-gray-600 font-medium mb-1">
-              No Japanese CV uploaded
-            </p>
-            <p className="text-sm text-gray-500">
-              Upload your Japanese CV to showcase your qualifications
-            </p>
-          </div>
-        )}
-      </div>
+      <CvContent
+        title="🇯🇵 Japanese CV"
+        cvData={japaneseCV}
+        isUploading={isUploading}
+        isDeleting={isDeleting}
+        downloadCV={downloadCV}
+        handleDelete={handleDelete}
+        language={"Japanese"}
+      />
 
       {/* English CV */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-            🇺🇸 English CV
-          </h3>
-          {englishCV?.url && (
-            <Badge variant="outline" className="text-xs">
-              Active
-            </Badge>
-          )}
-        </div>
 
-        {englishCV?.url ? (
-          <Item
-            variant="muted"
-            className="bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300 transition-all duration-200"
-          >
-            <ItemContent className="flex-1">
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  {(isUploading.English || isDeleting.English) && (
-                    <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-                    </div>
-                  )}
-                  <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-blue-100 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-blue-600" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    {isUploading.English && (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                        <span className="text-sm text-blue-600">
-                          Uploading...
-                        </span>
-                      </>
-                    )}
-                    {isDeleting.English && (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin text-red-600" />
-                        <span className="text-sm text-red-600">
-                          Deleting...
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </ItemContent>
-            <ItemActions className="flex gap-2">
-              <Button
-                onClick={() => downloadCV(englishCV?.url!, "English-cv.pdf")}
-                variant="outline"
-                size="icon"
-                className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
-                disabled={isUploading.English || isDeleting.English}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
-                onClick={() => handleDelete("English")}
-                disabled={isUploading.English || isDeleting.English}
-                aria-label="Delete English CV"
-              >
-                {isDeleting.English ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-              </Button>
-            </ItemActions>
-          </Item>
-        ) : (
-          <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-            <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-            <p className="text-gray-600 font-medium mb-1">
-              No English CV uploaded
-            </p>
-            <p className="text-sm text-gray-500">
-              Upload your English CV to showcase your qualifications
-            </p>
-          </div>
-        )}
-      </div>
+      <CvContent
+        title="🇺🇸 English CV"
+        cvData={englishCV}
+        isUploading={isUploading}
+        isDeleting={isDeleting}
+        downloadCV={downloadCV}
+        handleDelete={handleDelete}
+        language={"Japanese"}
+      />
 
       {/* Upload Areas */}
       <div className="space-y-6">
@@ -382,7 +224,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
   );
 };
 
-export const UploadArea = ({
+const UploadArea = ({
   cv,
   isDragging,
   isUploading,
@@ -491,6 +333,145 @@ export const UploadArea = ({
           className="hidden"
         />
       </div>
+    </div>
+  );
+};
+
+const CvEmptyState = ({ language }: { language: string }) => {
+  return (
+    <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+      <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+      <p className="text-gray-600 font-medium mb-1">
+        No {language} CV uploaded
+      </p>
+      <p className="text-sm text-gray-500">
+        Upload your {language} CV to showcase your qualifications
+      </p>
+    </div>
+  );
+};
+
+const CvCard = ({
+  cvData,
+  isUploading,
+  isDeleting,
+  downloadCV,
+  handleDelete,
+  language,
+}: {
+  cvData: any;
+  isUploading: any;
+  isDeleting: any;
+  downloadCV: (url: string, filename: string) => void;
+  handleDelete: (language: "Japanese" | "English") => void;
+  language: "Japanese" | "English";
+}) => {
+  return (
+    <Item
+      variant="muted"
+      className="bg-linear-to-r from-red-50 to-pink-50 border-red-200 hover:border-red-300 transition-all duration-200"
+    >
+      <ItemContent className="flex-1">
+        <div className="flex items-center gap-4">
+          <div className="relative group">
+            {(isUploading[language] || isDeleting[language]) && (
+              <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-red-600" />
+              </div>
+            )}
+            <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-red-100 flex items-center justify-center">
+              <FileText className="h-12 w-12 text-red-600" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              {isUploading[language] && (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                  <span className="text-sm text-blue-600">Uploading...</span>
+                </>
+              )}
+              {isDeleting[language] && (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                  <span className="text-sm text-red-600">Deleting...</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </ItemContent>
+      <ItemActions className="flex gap-2">
+        <Button
+          onClick={() => downloadCV(cvData?.url!, language + "-cv.pdf")}
+          variant="outline"
+          size="icon"
+          className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
+          disabled={isUploading[language] || isDeleting[language]}
+        >
+          <Download className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+          onClick={() => handleDelete(language)}
+          disabled={isUploading[language] || isDeleting[language]}
+          aria-label="Delete CV"
+        >
+          {isDeleting.Japanese ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </Button>
+      </ItemActions>
+    </Item>
+  );
+};
+
+const CvContent = ({
+  cvData,
+  isUploading,
+  isDeleting,
+  downloadCV,
+  handleDelete,
+  language,
+  title,
+}: {
+  cvData: any;
+  isUploading: any;
+  isDeleting: any;
+  downloadCV: (url: string, filename: string) => void;
+  handleDelete: (language: "Japanese" | "English") => void;
+  language: "Japanese" | "English";
+  title: string;
+}) => {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          {title}
+        </h3>
+        {cvData?.url && (
+          <Badge variant="outline" className="text-xs">
+            Active
+          </Badge>
+        )}
+      </div>
+
+      {cvData?.url ? (
+        <CvCard
+          cvData={cvData}
+          isUploading={isUploading}
+          isDeleting={isDeleting}
+          downloadCV={downloadCV}
+          handleDelete={handleDelete}
+          language={language}
+        />
+      ) : (
+        <CvEmptyState language={language} />
+      )}
     </div>
   );
 };
