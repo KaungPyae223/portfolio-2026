@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Ref } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -23,20 +23,32 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 
-interface CVFile {
-  id: string;
-  name: string;
-  size: string;
-  uploadDate: string;
-}
+const CVInfo = ({ allCVs }: { allCVs: any }) => {
+  const japaneseCV = allCVs?.find(
+    (data: any) => data.category == "cv-Japanese"
+  );
 
-const CVInfo = ({ cvURL }: { cvURL: string }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const englishCV = allCVs?.find((data: any) => data.category == "cv-English");
 
-  const downloadCV = async (url: string, filename = "kaung pyae aung cv.pdf") => {
+  const [isDragging, setIsDragging] = useState<{
+    Japanese: boolean;
+    English: boolean;
+  }>({ Japanese: false, English: false });
+  const [isUploading, setIsUploading] = useState<{
+    Japanese: boolean;
+    English: boolean;
+  }>({ Japanese: false, English: false });
+  const [isDeleting, setIsDeleting] = useState<{
+    Japanese: boolean;
+    English: boolean;
+  }>({ Japanese: false, English: false });
+  const JapaneseFileInputRef = useRef<HTMLInputElement>(null);
+  const EnglishFileInputRef = useRef<HTMLInputElement>(null);
+
+  const downloadCV = async (
+    url: string,
+    filename = "kaung pyae aung cv.pdf"
+  ) => {
     const res = await fetch(url);
     const blob = await res.blob();
 
@@ -48,7 +60,10 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
     document.body.removeChild(link);
   };
 
-  const handleFileUpload = async (files: FileList | null) => {
+  const handleFileUpload = async (
+    files: FileList | null,
+    language: "Japanese" | "English"
+  ) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
@@ -63,61 +78,82 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
       return;
     }
 
-    setIsUploading(true);
+    setIsUploading((prev) => ({ ...prev, [language]: true }));
 
     try {
       const form = new FormData();
       form.set("cv", file);
+      form.set("language", language);
 
       await formApi.patch("/home-management/upload-cv", form);
 
       mutate("/user-side/home?language=Japanese");
       mutate("/user-side/home?language=English");
 
-      toast.success("CV uploaded successfully");
+      toast.success(
+        `${
+          language === "Japanese" ? "Japanese" : "English"
+        } CV uploaded successfully`
+      );
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to upload CV";
       toast.error(message);
     } finally {
-      setIsUploading(false);
+      setIsUploading((prev) => ({ ...prev, [language]: false }));
     }
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (
+    e: React.DragEvent,
+    language: "Japanese" | "English"
+  ) => {
     e.preventDefault();
-    setIsDragging(true);
+    setIsDragging((prev) => ({ ...prev, [language]: true }));
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (
+    e: React.DragEvent,
+    language: "Japanese" | "English"
+  ) => {
     e.preventDefault();
-    setIsDragging(false);
+    setIsDragging((prev) => ({ ...prev, [language]: false }));
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent, language: "Japanese" | "English") => {
     e.preventDefault();
-    setIsDragging(false);
-    handleFileUpload(e.dataTransfer.files);
+    setIsDragging((prev) => ({ ...prev, [language]: false }));
+    handleFileUpload(e.dataTransfer.files, language);
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete your CV?")) {
+  const handleDelete = async (language: "Japanese" | "English") => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete your ${
+          language === "Japanese" ? "Japanese" : "English"
+        } CV?`
+      )
+    ) {
       return;
     }
 
-    setIsDeleting(true);
+    setIsDeleting((prev) => ({ ...prev, [language]: true }));
 
     try {
-      await api.delete("/home-management/delete-cv");
+      await api.delete(`/home-management/delete-cv/${language}`);
 
       mutate("/user-side/home?language=Japanese");
       mutate("/user-side/home?language=English");
 
-      toast.success("CV deleted successfully");
+      toast.success(
+        `${
+          language === "Japanese" ? "Japanese" : "English"
+        } CV deleted successfully`
+      );
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to delete CV";
       toast.error(message);
     } finally {
-      setIsDeleting(false);
+      setIsDeleting((prev) => ({ ...prev, [language]: false }));
     }
   };
 
@@ -131,37 +167,39 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
         </p>
       </div>
 
-      {/* Current CV */}
+      {/* Japanese CV */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-gray-700">Current CV</h3>
-          {cvURL && (
+          <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+            🇯🇵 Japanese CV
+          </h3>
+          {japaneseCV?.url && (
             <Badge variant="outline" className="text-xs">
               Active
             </Badge>
           )}
         </div>
 
-        {cvURL ? (
+        {japaneseCV?.url ? (
           <Item
             variant="muted"
-            className="bg-linear-to-r from-green-50 to-emerald-50 border-green-200 hover:border-green-300 transition-all duration-200"
+            className="bg-linear-to-r from-red-50 to-pink-50 border-red-200 hover:border-red-300 transition-all duration-200"
           >
             <ItemContent className="flex-1">
               <div className="flex items-center gap-4">
                 <div className="relative group">
-                  {(isUploading || isDeleting) && (
+                  {(isUploading.Japanese || isDeleting.Japanese) && (
                     <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
-                      <Loader2 className="h-6 w-6 animate-spin text-green-600" />
+                      <Loader2 className="h-6 w-6 animate-spin text-red-600" />
                     </div>
                   )}
-                  <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-green-100 flex items-center justify-center">
-                    <FileText className="h-12 w-12 text-green-600" />
+                  <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-red-100 flex items-center justify-center">
+                    <FileText className="h-12 w-12 text-red-600" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    {isUploading && (
+                    {isUploading.Japanese && (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                         <span className="text-sm text-blue-600">
@@ -169,7 +207,7 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
                         </span>
                       </>
                     )}
-                    {isDeleting && (
+                    {isDeleting.Japanese && (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin text-red-600" />
                         <span className="text-sm text-red-600">
@@ -183,11 +221,11 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
             </ItemContent>
             <ItemActions className="flex gap-2">
               <Button
-                onClick={() => downloadCV(cvURL)}
+                onClick={() => downloadCV(japaneseCV?.url!, "Japanese-cv.pdf")}
                 variant="outline"
                 size="icon"
                 className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
-                disabled={isUploading || isDeleting}
+                disabled={isUploading.Japanese || isDeleting.Japanese}
               >
                 <Download className="h-4 w-4" />
               </Button>
@@ -195,11 +233,11 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
                 variant="outline"
                 size="icon"
                 className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
-                onClick={handleDelete}
-                disabled={isUploading || isDeleting}
-                aria-label="Delete CV"
+                onClick={() => handleDelete("Japanese")}
+                disabled={isUploading.Japanese || isDeleting.Japanese}
+                aria-label="Delete Japanese CV"
               >
-                {isDeleting ? (
+                {isDeleting.Japanese ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Trash2 className="h-4 w-4" />
@@ -210,95 +248,248 @@ const CVInfo = ({ cvURL }: { cvURL: string }) => {
         ) : (
           <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
             <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-            <p className="text-gray-600 font-medium mb-1">No CV uploaded</p>
+            <p className="text-gray-600 font-medium mb-1">
+              No Japanese CV uploaded
+            </p>
             <p className="text-sm text-gray-500">
-              Upload your CV to showcase your qualifications
+              Upload your Japanese CV to showcase your qualifications
             </p>
           </div>
         )}
       </div>
 
-      {/* Upload Area */}
-      <div className="rounded-lg border border-gray-200 bg-linear-to-br from-gray-50 to-white p-6 space-y-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-          <span className="w-1 h-4 bg-gray-500 rounded-full"></span>
-          {cvURL ? "Change CV" : "Upload CV"}
-        </h3>
-
-        <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 relative ${
-            isDragging
-              ? "border-green-400 bg-green-50 scale-[1.02]"
-              : isUploading
-              ? "border-blue-400 bg-blue-50"
-              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {isUploading && (
-            <div className="absolute inset-0 bg-white bg-opacity-90 rounded-lg flex flex-col items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
-              <p className="text-sm font-medium text-blue-600 mb-2">
-                Uploading CV...
-              </p>
-            </div>
+      {/* English CV */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+            🇺🇸 English CV
+          </h3>
+          {englishCV?.url && (
+            <Badge variant="outline" className="text-xs">
+              Active
+            </Badge>
           )}
-
-          <Upload
-            className={`mx-auto h-12 w-12 mb-4 transition-colors ${
-              isUploading
-                ? "text-blue-400"
-                : isDragging
-                ? "text-green-500"
-                : "text-gray-400"
-            }`}
-          />
-          <p
-            className={`text-sm mb-2 ${
-              isUploading
-                ? "text-blue-600"
-                : isDragging
-                ? "text-green-600"
-                : "text-gray-600"
-            }`}
-          >
-            {isUploading
-              ? "Processing your CV..."
-              : isDragging
-              ? "Drop your CV here"
-              : "Drag and drop your CV here, or click to browse"}
-          </p>
-          <p className="text-xs text-gray-500 mb-4">
-            PDF files only (Max 10MB)
-          </p>
-          <Button
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="mb-2"
-            disabled={isUploading}
-          >
-            {isUploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Choose CV
-              </>
-            )}
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf"
-            onChange={(e) => handleFileUpload(e.target.files)}
-            className="hidden"
-          />
         </div>
+
+        {englishCV?.url ? (
+          <Item
+            variant="muted"
+            className="bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300 transition-all duration-200"
+          >
+            <ItemContent className="flex-1">
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  {(isUploading.English || isDeleting.English) && (
+                    <div className="absolute inset-0 bg-white bg-opacity-80 rounded-md flex items-center justify-center">
+                      <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                    </div>
+                  )}
+                  <div className="w-32 h-32 rounded-md object-cover border-2 border-white shadow-sm transition-transform duration-200 group-hover:scale-105 bg-blue-100 flex items-center justify-center">
+                    <FileText className="h-12 w-12 text-blue-600" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    {isUploading.English && (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        <span className="text-sm text-blue-600">
+                          Uploading...
+                        </span>
+                      </>
+                    )}
+                    {isDeleting.English && (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-red-600" />
+                        <span className="text-sm text-red-600">
+                          Deleting...
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </ItemContent>
+            <ItemActions className="flex gap-2">
+              <Button
+                onClick={() => downloadCV(englishCV?.url!, "English-cv.pdf")}
+                variant="outline"
+                size="icon"
+                className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-colors"
+                disabled={isUploading.English || isDeleting.English}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
+                onClick={() => handleDelete("English")}
+                disabled={isUploading.English || isDeleting.English}
+                aria-label="Delete English CV"
+              >
+                {isDeleting.English ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </Button>
+            </ItemActions>
+          </Item>
+        ) : (
+          <div className="text-center py-12 px-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
+            <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+            <p className="text-gray-600 font-medium mb-1">
+              No English CV uploaded
+            </p>
+            <p className="text-sm text-gray-500">
+              Upload your English CV to showcase your qualifications
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Upload Areas */}
+      <div className="space-y-6">
+        {/* Japanese Upload Area */}
+        <UploadArea
+          cv={englishCV}
+          isDragging={isDragging}
+          isUploading={isUploading}
+          handleDragOver={handleDragOver}
+          handleDragLeave={handleDragLeave}
+          handleDrop={handleDrop}
+          fileInputRef={EnglishFileInputRef}
+          handleFileUpload={handleFileUpload}
+          language="Japanese"
+        />
+
+        {/* English Upload Area */}
+
+        <UploadArea
+          cv={englishCV}
+          isDragging={isDragging}
+          isUploading={isUploading}
+          handleDragOver={handleDragOver}
+          handleDragLeave={handleDragLeave}
+          handleDrop={handleDrop}
+          fileInputRef={EnglishFileInputRef}
+          handleFileUpload={handleFileUpload}
+          language="English"
+        />
+      </div>
+    </div>
+  );
+};
+
+export const UploadArea = ({
+  cv,
+  isDragging,
+  isUploading,
+  handleDragOver,
+  handleDragLeave,
+  handleDrop,
+  fileInputRef,
+  handleFileUpload,
+  language,
+}: {
+  cv: any;
+  isDragging: any;
+  isUploading: any;
+  handleDragOver: (
+    e: React.DragEvent,
+    language: "Japanese" | "English"
+  ) => void;
+  handleDragLeave: (
+    e: React.DragEvent,
+    language: "Japanese" | "English"
+  ) => void;
+  handleDrop: (e: React.DragEvent, language: "Japanese" | "English") => void;
+  fileInputRef: Ref<HTMLInputElement>;
+  handleFileUpload: (
+    files: FileList | null,
+    language: "Japanese" | "English"
+  ) => void;
+  language: "Japanese" | "English";
+}) => {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-linear-to-br from-gray-50 to-white p-6 space-y-4">
+      <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+        {cv?.url ? `Change ${language} CV` : `Upload ${language} CV`}
+      </h3>
+
+      <div
+        className={`border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 relative ${
+          isDragging[language]
+            ? "border-blue-400 bg-blue-50 scale-[1.02]"
+            : isUploading[language]
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+        }`}
+        onDragOver={(e) => handleDragOver(e, language)}
+        onDragLeave={(e) => handleDragLeave(e, language)}
+        onDrop={(e) => handleDrop(e, language)}
+      >
+        {isUploading[language] && (
+          <div className="absolute inset-0 bg-white bg-opacity-90 rounded-lg flex flex-col items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mb-3" />
+            <p className="text-sm font-medium text-blue-600 mb-2">
+              Uploading {language} CV...
+            </p>
+          </div>
+        )}
+
+        <Upload
+          className={`mx-auto h-12 w-12 mb-4 transition-colors ${
+            isUploading[language]
+              ? "text-blue-400"
+              : isDragging[language]
+              ? "text-blue-500"
+              : "text-gray-400"
+          }`}
+        />
+        <p
+          className={`text-sm mb-2 ${
+            isUploading[language]
+              ? "text-blue-600"
+              : isDragging[language]
+              ? "text-blue-600"
+              : "text-gray-600"
+          }`}
+        >
+          {isUploading[language]
+            ? `Processing your ${language} CV...`
+            : isDragging[language]
+            ? `Drop your ${language} CV here`
+            : `Drag and drop your ${language} CV here, or click to browse`}
+        </p>
+        <p className="text-xs text-gray-500 mb-4">PDF files only (Max 10MB)</p>
+        <Button
+          variant="outline"
+          onClick={() => fileInputRef?.current?.click()}
+          className="mb-2"
+          disabled={isUploading.English}
+        >
+          {isUploading.English ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Uploading...
+            </>
+          ) : (
+            <>
+              <Upload className="mr-2 h-4 w-4" />
+              Choose English CV
+            </>
+          )}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf"
+          onChange={(e) => handleFileUpload(e.target.files, language)}
+          className="hidden"
+        />
       </div>
     </div>
   );
