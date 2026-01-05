@@ -19,9 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import HomeHeroManagementPreview from "./HomeHeroManagementPreview";
+
 import Link from "next/link";
 import { ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
 import useSWR, { mutate } from "swr";

@@ -39,7 +39,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 
 export function AdminNav() {
   const navigationItems = [
@@ -114,7 +115,7 @@ export function AdminNav() {
           <SidebarGroupContent>
             <SidebarMenu className="px-2">
               <Select
-                defaultValue={param.get("language") || "English"}
+                defaultValue={param.get("language") || "en"}
                 onValueChange={(value) => router.push("?language=" + value)}
               >
                 <SelectTrigger className="w-full">
@@ -124,8 +125,8 @@ export function AdminNav() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Languages</SelectLabel>
-                    <SelectItem value="English">English</SelectItem>
-                    <SelectItem value="Japanese">Japanese</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="jp">Japanese</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

@@ -30,30 +30,38 @@ import HomeHeroManagementPreview from "./HomeHeroManagementPreview";
 import Link from "next/link";
 import Image from "next/image";
 import { Upload, X } from "lucide-react";
+import useSWR, { mutate } from "swr";
+import { fetcher } from "@/services/fetcher";
+import Loading from "@/features/global/components/Loading";
+import { api, formApi } from "@/services/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
-  prefix: z
-    .string()
-    .min(2, { message: "prefix is required" })
-    .max(4, { message: "prefix is too long" }),
   name: z
     .string()
     .min(2, { message: "name is required" })
     .max(50, { message: "name is too long" }),
-  title: z
-    .string()
-    .min(2, { message: "title is required" })
-    .max(50, { message: "title is too long" }),
-  content: z
-    .string()
-    .min(2, { message: "content is required" })
-    .max(50, { message: "content is too long" }),
+  image: z
+    .instanceof(File)
+    .refine(
+      (file) => file.size <= 2 * 1024 * 1024,
+      "File size must be less than 2MB"
+    ),
 });
 
 const HomeSkillEditForm = () => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const { data, error, isLoading } = useSWR(
+    "/user-side/home?language=English",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    }
+  );
+
   const [skillImage, setSkillImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (files: FileList | null) => {
@@ -82,6 +90,7 @@ const HomeSkillEditForm = () => {
       setSkillImage(e.target?.result as string);
     };
     reader.readAsDataURL(file);
+    form.setValue("image", file);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -111,20 +120,49 @@ const HomeSkillEditForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prefix: "I'm",
-      name: "Kaung Pyae Aung",
-      title: "Full stack web developer",
-      content:
-        "I recently finished the Bachelor of Computing and have an experience in web development with HTML, CSS, JavaScript, React, Next.js and Laravel. I have completed several projects, including portfolio websites, e-commerce, e-learning platforms, and others.",
+      name: "",
+      image: undefined,
     },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("image", values.image);
+
+    setLoading(true);
+    try {
+      await formApi.post("/home-management/create-skill", formData);
+      mutate("/user-side/home?language=Japanese");
+      mutate("/user-side/home?language=English");
+
+      toast.success("Skill created successfully");
+      form.reset();
+      setSkillImage(null);
+      setLoading(false);
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   }
+
+  const deleteSkill = async (id: string) => {
+    if (window.confirm("Are you sure to delete")) {
+      try {
+        await api.delete("/home-management/delete-skill/" + id);
+        mutate("/user-side/home?language=English");
+        mutate("/user-side/home?language=Japanese");
+        form.reset();
+        toast.success("Skill deleted successfully");
+      } catch (error: any) {
+        const message = error.response?.data?.message || "Something went wrong";
+        toast.error(message);
+      }
+    }
+  };
+
+  if (isLoading) return <Loading />;
 
   return (
     <div>
@@ -147,134 +185,160 @@ const HomeSkillEditForm = () => {
             </div>
 
             {/* Add New Skill Form */}
-            <div className="bg-linear-to-br w-96 from-gray-50 to-white rounded-lg border border-gray-200 p-4 mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-4">
-                Add New Skill
-              </h3>
-              <div className="grid grid-cols-1 gap-4 ">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-2">
-                    Skill Name
-                  </label>
-                  <Input placeholder="e.g., React, TypeScript, Node.js" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-2">
-                    Skill Icon/Logo
-                  </label>
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
-                      isDragging
-                        ? "border-blue-400 bg-blue-50"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    {skillImage ? (
-                      <div className="relative">
-                        <img
-                          src={skillImage}
-                          alt="Skill icon"
-                          className="w-16 h-16 mx-auto object-cover rounded-lg"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            clearImage();
-                          }}
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                        <p className="text-xs text-gray-500 mt-2">
-                          Click to change
-                        </p>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="bg-white rounded-lg border border-gray-200 w-lg p-6 mb-6 shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                    Add New Skill
+                  </h3>
+                  <div className="space-y-6">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Skill Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Skill Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 block mb-2">
+                        Skill Icon/Logo
+                      </label>
+                      <div
+                        className={`border-2 mb-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${
+                          isDragging
+                            ? "border-blue-400 bg-blue-50"
+                            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+                        }`}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        {skillImage && !loading ? (
+                          <div className="relative">
+                            <img
+                              src={skillImage}
+                              alt="Skill icon"
+                              className="w-20 h-20 mx-auto object-cover rounded-lg shadow-sm"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="sm"
+                              className="absolute -top-2 -right-2 h-8 w-8 p-0 rounded-full shadow-lg"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                clearImage();
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                            <p className="text-xs text-gray-500 mt-2">
+                              Click to change
+                            </p>
+                          </div>
+                        ) : loading ? (
+                          <div className="py-8">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                            <p className="text-sm text-gray-600">
+                              Uploading skill...
+                            </p>
+                          </div>
+                        ) : (
+                          <div>
+                            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                            <p className="text-base text-gray-600 mb-2">
+                              Drag and drop or click to upload
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              PNG, JPG, WebP, SVG (Max 2MB)
+                            </p>
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div>
-                        <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600 mb-1">
-                          Drag and drop or click to upload
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PNG, JPG, WebP, SVG (Max 2MB)
-                        </p>
-                      </div>
-                    )}
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) {
+                                    form.setValue("image", file);
+                                    handleImageUpload(e.target.files);
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/svg+xml"
-                    onChange={(e) => handleImageUpload(e.target.files)}
-                    className="hidden"
-                  />
+                  <div className="mt-6 flex justify-end">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="px-6 py-2"
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Adding Skill...
+                        </>
+                      ) : (
+                        "Add Skill"
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4 flex justify-end">
-                <Button className="w-full md:w-auto">Add Skill</Button>
-              </div>
-            </div>
+              </form>
+            </Form>
 
             {/* Skills Grid */}
             <div className="space-y-4">
               <h3 className="text-sm font-medium text-gray-700">
-                Current Skills (10)
+                Current Skills ({data?.data.skills.length})
               </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
+              <div className="grid grid/delete-skill/:id-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {/* Sample Skill Cards */}
-                {[
-                  {
-                    name: "HTML",
-                  },
-                  {
-                    name: "CSS",
-                  },
-                  {
-                    name: "JavaScript",
-                  },
-                  {
-                    name: "React",
-                  },
-                  {
-                    name: "TypeScript",
-                  },
-                  {
-                    name: "Node.js",
-                  },
-                  {
-                    name: "Next.js",
-                  },
-                  {
-                    name: "Tailwind",
-                  },
-                ].map((skill, index) => (
+                {data?.data.skills.map((skill: any) => (
                   <div
-                    key={index}
-                    className={`bg-linear-to-r from-orange-50 to-yellow-50 border-orange-200 border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer group relative`}
+                    key={skill.id}
+                    className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all cursor-pointer group relative hover:-translate-y-1"
                   >
-                    <div className="aspect-square mb-3 bg-white rounded-lg flex items-center justify-center">
-                      <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <span className="text-xs font-bold text-gray-600">
-                          {skill.name.slice(0, 2)}
-                        </span>
-                      </div>
+                    <div className="aspect-square mb-3 bg-gray-50 rounded-lg flex items-center justify-center">
+                      <Image
+                        src={skill.image}
+                        alt={skill.name}
+                        width={120}
+                        height={120}
+                        className="rounded-lg object-contain p-2"
+                      />
                     </div>
-                    <p className="text-center font-medium text-sm text-gray-800">
+                    <p className="text-center font-medium text-sm text-gray-900 truncate">
                       {skill.name}
                     </p>
                     <Button
                       size="sm"
                       variant="destructive"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all h-8 w-8 p-0 rounded-full shadow-lg"
+                      onClick={() => deleteSkill(skill.id)}
                     >
-                      ×
+                      <X className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}

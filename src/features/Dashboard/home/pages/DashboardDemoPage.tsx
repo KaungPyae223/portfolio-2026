@@ -13,18 +13,19 @@ import AboutExperiences from "@/features/about/components/AboutExperiences";
 import useSWR from "swr";
 import { fetcher } from "@/services/fetcher";
 import Loading from "@/features/global/components/Loading";
+import { useLocale } from "next-intl";
 
 type Props = {
   section: string;
 };
 
 const DashboardDemoPage: React.FC<Props> = ({ section }) => {
+  const locale = useLocale();
   const searchParams = useSearchParams();
+
+  const language = locale == "en" ? "English" : "Japanese";
+
   const darkMode = searchParams.get("dark") === "true";
-
-  const param = useSearchParams();
-
-  const language = param.get("language") || "English";
 
   const { data, error, isLoading } = useSWR(
     `/user-side/home?language=${language}`,
@@ -58,7 +59,7 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
         cvURL={data?.data.cvURL}
       />
     ),
-    homeSkills: <HomeSkills />,
+    homeSkills: <HomeSkills skills={data?.data.skills} />,
     homeContact: (
       <HomeContact
         profileURL={data?.data.profileURL}

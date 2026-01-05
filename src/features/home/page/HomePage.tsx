@@ -14,8 +14,7 @@ import { useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
 
 const HomePage = () => {
-  const param = useSearchParams();
-
+  
   const locale = useLocale();
 
   const language = locale == "en" ? "English" : "Japanese";
@@ -54,7 +53,7 @@ const HomePage = () => {
           profileURL={data?.data.profileURL}
           cvURL={data?.data.cvURL}
         />
-        <HomeSkills />
+        <HomeSkills skills={data?.data.skills} />
         <HomeProjects />
         <HomeCertificates />
         <HomeContact

@@ -1,56 +1,12 @@
 "use client";
 import { motion } from "framer-motion";
-import {
-  Code,
-  Database,
-  Globe,
-  Server,
-  Palette,
-  GitBranch,
-  Terminal,
-  Layers,
-  Cpu,
-  Cloud,
-  Package,
-  Zap,
-  Layout,
-  Shield,
-  Box,
-  GitMerge,
-  Coffee,
-} from "lucide-react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
-const HomeSkills = () => {
+const HomeSkills = ({ skills }: { skills: any }) => {
   const t = useTranslations("home");
 
-  const allSkills = [
-    { name: "React", icon: <Code className="w-8 h-8" />, level: 90 },
-    { name: "Next.js", icon: <Globe className="w-8 h-8" />, level: 85 },
-    { name: "TypeScript", icon: <Terminal className="w-8 h-8" />, level: 80 },
-    { name: "HTML/CSS", icon: <Layout className="w-8 h-8" />, level: 95 },
-    { name: "JavaScript", icon: <Coffee className="w-8 h-8" />, level: 90 },
-    { name: "Laravel", icon: <Server className="w-8 h-8" />, level: 85 },
-    { name: "Express.js", icon: <Zap className="w-8 h-8" />, level: 80 },
-    { name: "Node.js", icon: <Cpu className="w-8 h-8" />, level: 75 },
-    { name: "PHP", icon: <Code className="w-8 h-8" />, level: 80 },
-    { name: "MySQL", icon: <Database className="w-8 h-8" />, level: 85 },
-    { name: "MongoDB", icon: <Database className="w-8 h-8" />, level: 80 },
-    { name: "PostgreSQL", icon: <Database className="w-8 h-8" />, level: 75 },
-    { name: "Git", icon: <GitBranch className="w-8 h-8" />, level: 85 },
-    { name: "Docker", icon: <Box className="w-8 h-8" />, level: 70 },
-    { name: "REST API", icon: <Globe className="w-8 h-8" />, level: 90 },
-    { name: "GraphQL", icon: <GitMerge className="w-8 h-8" />, level: 75 },
-    { name: "Tailwind CSS", icon: <Palette className="w-8 h-8" />, level: 90 },
-    { name: "Bootstrap", icon: <Layers className="w-8 h-8" />, level: 85 },
-    { name: "Webpack", icon: <Package className="w-8 h-8" />, level: 75 },
-    { name: "Vite", icon: <Zap className="w-8 h-8" />, level: 80 },
-    { name: "AWS", icon: <Cloud className="w-8 h-8" />, level: 70 },
-    { name: "Firebase", icon: <Shield className="w-8 h-8" />, level: 75 },
-    { name: "Figma", icon: <Palette className="w-8 h-8" />, level: 80 },
-    { name: "VS Code", icon: <Code className="w-8 h-8" />, level: 95 },
-    { name: "JWT", icon: <Shield className="w-8 h-8" />, level: 85 },
-  ];
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -115,13 +71,17 @@ const HomeSkills = () => {
           variants={containerVariants}
         >
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {allSkills.map((skill) => (
+            {skills.map((skill: any) => (
               <motion.div key={skill.name} variants={itemVariants}>
                 <div className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-                  <div className="text-yellow-600 dark:text-yellow-400">
-                    {skill.icon}
-                  </div>
-                  <div className="text-center">
+                  <Image
+                    src={skill.image}
+                    alt={skill.name}
+                    width={100}
+                    height={100}
+                    
+                  />
+                  <div className="text-center mt-4">
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                       {skill.name}
                     </h3>

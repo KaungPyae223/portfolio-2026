@@ -41,7 +41,7 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({
 
   const param = useSearchParams();
 
-  const language = param.get("language") || "English";
+  const language = param.get("language") ?? "en";
 
   return (
     <Card
@@ -112,7 +112,7 @@ const DashboardHomeCard: React.FC<HomeCardType> = ({
           className={`${devideInfo[devide]}  dark:bg-gray-800 transform duration-300 relative  mx-auto rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 `}
         >
           <iframe
-            src={url + "?dark=" + isDark + "&language=" + language}
+            src={"/" + language + "/demo/" + url + "?dark=" + isDark}
             className="absolute  inset-0 w-full h-full "
           />
         </div>
