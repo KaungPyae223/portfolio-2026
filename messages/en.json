@@ -12,7 +12,10 @@
     "certificates": "Certificates",
     "menu": "Menu",
     "setting": "Settings",
-    "languages": "Languages"
+    "languages": "Languages",
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "close": "Close"
   },
 
   "home": {

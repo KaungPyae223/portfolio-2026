@@ -129,7 +129,7 @@ const NavBar = () => {
       </Drawer>
       <div
         ref={containerRef}
-        className="h-32 fixed left-0 top-0 w-full z-50 duration-700 "
+        className="h-32 fixed left-0 top-0 w-full z-40 duration-700 "
       >
         <div className="py-10 md:py-5  hidden md:flex justify-center w-full">
           <div className="bg-white dark:bg-gray-800 border border-gray-300/80  dark:border-white/50 shadow-lg p-3 rounded-full flex items-center gap-5 transition-colors">

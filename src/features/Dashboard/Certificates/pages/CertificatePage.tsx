@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useDashboardStore } from "@/store/useDashboardStroe";
+import { useRouter } from "@/i18n/navigation";
 import CertificateCardList from "../components/CertificateCardList";
 import CertificateTable from "../components/CertificateTable";
 
@@ -19,12 +20,17 @@ import { Grid, List, Plus, Search, Filter } from "lucide-react";
 
 const CertificatePage = () => {
   const { setTitle, setBreadCrumbContent } = useDashboardStore();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setTitle("Certificates Management");
     setBreadCrumbContent([]);
   }, []);
+
+  const handleAddCertificate = () => {
+    router.push("/dashboard/certificates/create");
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -41,7 +47,7 @@ const CertificatePage = () => {
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={handleAddCertificate}>
             <Plus className="mr-2 h-4 w-4" />
             Add Certificate
           </Button>

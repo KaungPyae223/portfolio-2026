@@ -121,12 +121,12 @@ const HomeNav = ({
               {darkMode ? (
                 <>
                   <Sun className="mr-2 h-4 w-4" />
-                  Light Mode
+                  {t("light")}
                 </>
               ) : (
                 <>
                   <Moon className="mr-2 h-4 w-4" />
-                  Dark Mode
+                  {t("dark")}
                 </>
               )}
             </Button>
@@ -161,7 +161,7 @@ const HomeNav = ({
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <DrawerClose asChild>
             <Button variant="outline" className="w-full">
-              Close
+              {t("close")}
             </Button>
           </DrawerClose>
         </div>

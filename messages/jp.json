@@ -10,9 +10,12 @@
     "projects": "プロジェクト",
     "about": "プロフィール",
     "certificates": "認定証",
-    "menu": "Menu",
-    "setting": "Settings",
-    "languages": "Languages"
+    "menu": "メニュー",
+    "setting": "設定",
+    "languages": "言語",
+    "light": "ライトモード",
+    "dark": "ダークモード",
+    "close": "閉じる"
   },
 
   "home": {

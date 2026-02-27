@@ -1,4 +1,4 @@
-import CertificatePage from '@/features/Dashboard/Certificates/pages/ProjectPage'
+import CertificatePage from '@/features/Dashboard/Certificates/pages/CertificatePage'
 import React from 'react'
 
 const page = () => {
