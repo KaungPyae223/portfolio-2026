@@ -1,29 +1,31 @@
+"use client";
+
 import { useEffect } from "react";
-import CertificateCreateForm from "../components/CertificateCreateForm";
+import CertificateEditForm from "../components/CertificateEditForm";
 import { useDashboardStore } from "@/store/useDashboardStroe";
 
-const CertificateCreatePage = () => {
+const CertificateEditPage = ({ id }: { id: string }) => {
   const { setTitle, setBreadCrumbContent } = useDashboardStore();
 
   useEffect(() => {
-    setTitle("Certificate Create");
+    setTitle("Certificate Edit");
     setBreadCrumbContent([
       {
         title: "Certificates",
         link: "/dashboard/certificates",
       },
       {
-        title: "Create",
-        link: "/dashboard/certificates/create",
+        title: "Edit",
+        link: `/dashboard/certificates/edit/${id}`,
       },
     ]);
   }, []);
 
   return (
     <div className="p-3">
-      <CertificateCreateForm />
+      <CertificateEditForm id={id} />
     </div>
   );
 };
 
-export default CertificateCreatePage;
+export default CertificateEditPage;

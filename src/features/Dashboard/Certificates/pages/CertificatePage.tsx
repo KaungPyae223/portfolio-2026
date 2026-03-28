@@ -17,11 +17,31 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Grid, List, Plus, Search, Filter } from "lucide-react";
+import { fetcher } from "@/services/fetcher";
+import useSWR from "swr";
 
 const CertificatePage = () => {
   const { setTitle, setBreadCrumbContent } = useDashboardStore();
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500); // delay (ms)
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const { data, error, isLoading } = useSWR(
+    `/certificate?q=${debouncedQuery}`,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    },
+  );
 
   useEffect(() => {
     setTitle("Certificates Management");
@@ -43,10 +63,6 @@ const CertificatePage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
           <Button size="sm" onClick={handleAddCertificate}>
             <Plus className="mr-2 h-4 w-4" />
             Add Certificate
@@ -59,8 +75,8 @@ const CertificatePage = () => {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search certificates..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           className="pl-10"
         />
       </div>
@@ -79,11 +95,11 @@ const CertificatePage = () => {
         </TabsList>
 
         <TabsContent value="grid" className="space-y-4">
-          <CertificateCardList searchQuery={searchQuery} />
+          <CertificateCardList data={data?.data} isLoading={isLoading} />
         </TabsContent>
 
         <TabsContent value="table" className="space-y-4">
-          <CertificateTable searchQuery={searchQuery} />
+          <CertificateTable data={data?.data} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

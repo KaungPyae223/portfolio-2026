@@ -11,123 +11,35 @@ import {
 import {
   Award,
   Calendar,
-  Download,
   Eye,
   Edit,
   Trash2,
   MoreHorizontal,
-  CheckCircle,
-  Clock,
-  Globe,
-  FileText,
 } from "lucide-react";
+import { Link } from "@/i18n/navigation";
+import { useSWRConfig } from "swr";
+import { toast } from "sonner";
+import { api } from "@/services/api";
 
 interface CertificateTableProps {
-  searchQuery?: string;
+  data: any[];
+  isLoading: boolean;
 }
 
-const CertificateTable = ({ searchQuery = "" }: CertificateTableProps) => {
-  type CertificateItem = {
-    id: number;
-    image: string;
-    title: string;
-    issuer: string;
-    issueDate: string;
-    expiryDate?: string;
-    credentialId?: string;
-    credentialUrl?: string;
-    verificationUrl?: string;
-    skills: string[];
-    status: "active" | "expired" | "pending";
-  };
+const CertificateTable = ({ data, isLoading }: CertificateTableProps) => {
+  const { mutate } = useSWRConfig();
 
-  // Sample certificate data
-  const data: CertificateItem[] = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-      title: "AWS Certified Solutions Architect",
-      issuer: "Amazon Web Services",
-      issueDate: "2023-06-15",
-      expiryDate: "2026-06-15",
-      credentialId: "AWS-ASA-123456",
-      credentialUrl: "https://aws.amazon.com/verification",
-      verificationUrl: "https://verify.aws.amazon.com/cert/123456",
-      skills: ["Cloud Computing", "AWS", "Architecture", "DevOps"],
-      status: "active",
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-      title: "Google Cloud Professional Developer",
-      issuer: "Google Cloud Platform",
-      issueDate: "2023-08-20",
-      expiryDate: "2025-08-20",
-      credentialId: "GCP-PD-789012",
-      credentialUrl: "https://cloud.google.com/credentials",
-      verificationUrl: "https://cloud.google.com/verify/789012",
-      skills: ["Google Cloud", "Development", "Kubernetes", "APIs"],
-      status: "active",
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1592210454359-801627e67647?w=800&h=600&fit=crop",
-      title: "Microsoft Azure Fundamentals",
-      issuer: "Microsoft",
-      issueDate: "2022-12-10",
-      expiryDate: "2024-12-10",
-      credentialId: "MS-AZ-345678",
-      credentialUrl: "https://learn.microsoft.com/certifications",
-      verificationUrl: "https://learn.microsoft.com/verify/345678",
-      skills: ["Azure", "Cloud Basics", "Networking", "Security"],
-      status: "expired",
-    },
-  ];
-
-  // Filter certificates based on search query
-  const filteredCertificates = useMemo(() => {
-    if (!searchQuery.trim()) return data;
-
-    const query = searchQuery.toLowerCase();
-    return data.filter(
-      (certificate) =>
-        certificate.title.toLowerCase().includes(query) ||
-        certificate.issuer.toLowerCase().includes(query) ||
-        certificate.skills.some((skill) =>
-          skill.toLowerCase().includes(query)
-        ) ||
-        certificate.status.toLowerCase().includes(query) ||
-        (certificate.credentialId &&
-          certificate.credentialId.toLowerCase().includes(query))
-    );
-  }, [searchQuery]);
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="w-4 h-4" />;
-      case "expired":
-        return <Clock className="w-4 h-4" />;
-      case "pending":
-        return <Clock className="w-4 h-4" />;
-      default:
-        return <CheckCircle className="w-4 h-4" />;
+  const deleteCertificate = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this certificate?")) {
+      return;
     }
-  };
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "expired":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+    try {
+      await api.delete(`/certificate/${id}`);
+      toast.success("Certificate deleted successfully");
+      mutate("/certificate");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
     }
   };
 
@@ -144,13 +56,7 @@ const CertificateTable = ({ searchQuery = "" }: CertificateTableProps) => {
                 Issuer
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                Status
-              </th>
-              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Issue Date
-              </th>
-              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                Expiry Date
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Skills
@@ -161,8 +67,8 @@ const CertificateTable = ({ searchQuery = "" }: CertificateTableProps) => {
             </tr>
           </thead>
           <tbody>
-            {filteredCertificates.length > 0 ? (
-              filteredCertificates.map((certificate) => (
+            {data?.length > 0 ? (
+              data.map((certificate) => (
                 <tr
                   key={certificate.id}
                   className="border-b transition-colors hover:bg-muted/50"
@@ -176,74 +82,40 @@ const CertificateTable = ({ searchQuery = "" }: CertificateTableProps) => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div>
-                        <div className="font-medium">{certificate.title}</div>
-                        {certificate.credentialId && (
-                          <div className="text-xs text-muted-foreground font-mono">
-                            {certificate.credentialId}
-                          </div>
-                        )}
-                      </div>
+                      <span className="text-base font-medium ">
+                        {certificate.title}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
                       <Award className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm">{certificate.issuer}</span>
+                      <span className="text-sm">{certificate.lecture}</span>
                     </div>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <Badge
-                      variant="secondary"
-                      className={`flex items-center gap-1 w-fit ${getStatusBadgeVariant(
-                        certificate.status
-                      )}`}
-                    >
-                      {getStatusIcon(certificate.status)}
-                      {certificate.status.charAt(0).toUpperCase() +
-                        certificate.status.slice(1)}
-                    </Badge>
                   </td>
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-1 text-sm text-muted-foreground">
                       <Calendar className="w-3 h-3" />
-                      {certificate.issueDate}
-                    </div>
-                  </td>
-                  <td className="p-4 align-middle">
-                    <div className="flex items-center gap-1 text-sm">
-                      {certificate.expiryDate ? (
-                        <>
-                          <Clock className="w-3 h-3 text-muted-foreground" />
-                          <span
-                            className={
-                              certificate.status === "expired"
-                                ? "text-red-600 dark:text-red-400"
-                                : "text-muted-foreground"
-                            }
-                          >
-                            {certificate.expiryDate}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-muted-foreground">No expiry</span>
-                      )}
+                      {certificate.complete_date}
                     </div>
                   </td>
                   <td className="p-4 align-middle">
                     <div className="flex flex-wrap gap-1">
-                      {certificate.skills.slice(0, 2).map((skill, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="text-xs"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                      {certificate.skills.length > 2 && (
+                      {certificate.technologies
+                        .split("/")
+                        .slice(0, 3)
+                        .map((skill: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="text-xs"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
+                      {certificate.technologies.split("/").length > 3 && (
                         <Badge variant="outline" className="text-xs">
-                          +{certificate.skills.length - 2}
+                          +{certificate.technologies.split("/").length - 3}
                         </Badge>
                       )}
                     </div>
@@ -256,26 +128,27 @@ const CertificateTable = ({ searchQuery = "" }: CertificateTableProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Certificate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Download className="w-4 h-4 mr-2" />
-                          Download PDF
-                        </DropdownMenuItem>
-                        {certificate.verificationUrl && (
+                        <Link href={certificate.url} target="_blank">
                           <DropdownMenuItem>
-                            <Globe className="w-4 h-4 mr-2" />
-                            Verify Online
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Certificate
                           </DropdownMenuItem>
-                        )}
+                        </Link>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit Certificate
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
+                        <Link
+                          href={`/dashboard/certificates/edit/${certificate.id}`}
+                        >
+                          <DropdownMenuItem>
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Certificate
+                          </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => deleteCertificate(certificate.id)}
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete Certificate
                         </DropdownMenuItem>

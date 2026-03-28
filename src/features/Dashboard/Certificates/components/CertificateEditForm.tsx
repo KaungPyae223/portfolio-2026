@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, X, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,
@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { formApi } from "@/services/api";
+import useSWR from "swr";
+import { fetcher } from "@/services/fetcher";
 
 const certificateSchema = z.object({
   title: z.string().min(1, "Certificate title is required"),
@@ -32,17 +34,18 @@ const certificateSchema = z.object({
     .refine(
       (file) => file.size <= 2 * 1024 * 1024,
       "File size must be less than 2MB",
-    ),
+    )
+    .optional(),
   skills: z.array(z.string()).min(1, "Skills is required"),
 });
 
-const CertificateCreateForm = () => {
+const CertificateEditForm = ({ id }: { id: string }) => {
   const [currentSkill, setCurrentSkill] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [certificateImage, setCertificateImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadLoading, setUploadLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUpdateLoading, setIsUpdateLoading] = useState(false);
 
   const form = useForm<z.infer<typeof certificateSchema>>({
     resolver: zodResolver(certificateSchema),
@@ -57,6 +60,25 @@ const CertificateCreateForm = () => {
   });
 
   const skills = form.watch("skills");
+
+  const { data, error, isLoading } = useSWR(
+    id ? `/certificate/${id}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    },
+  );
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    form.setValue("title", data?.data.title);
+    form.setValue("lecture", data?.data.lecture);
+    form.setValue("complete_date", data?.data.complete_date);
+    form.setValue("url", data?.data.url);
+    form.setValue("skills", data?.data.technologies.split("/"));
+  }, [data, isLoading]);
 
   const addSkill = () => {
     if (currentSkill.trim() && !skills.includes(currentSkill.trim())) {
@@ -130,27 +152,33 @@ const CertificateCreateForm = () => {
     }
   };
 
+  const router = useRouter();
+
   const onSubmit = async (data: z.infer<typeof certificateSchema>) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("lecture", data.lecture);
     formData.append("complete_date", data.complete_date);
     formData.append("url", data.url);
-    formData.append("image", data.image);
     formData.append("technologies", data.skills.join("/"));
 
-    setIsLoading(true);
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+
+    router.push("/dashboard/certificates");
+
+    setIsUpdateLoading(true);
 
     try {
-      await formApi.post("/certificate", formData);
-      toast.success("Certificate created successfully");
-      form.reset();
-      setCertificateImage(null);
-      setIsLoading(false);
+      await formApi.put(`/certificate/${id}`, formData);
+      toast.success("Certificate updated successfully");
+      setIsUpdateLoading(false);
+
     } catch (error: any) {
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
-      setIsLoading(false);
+      setIsUpdateLoading(false);
     }
   };
 
@@ -170,9 +198,7 @@ const CertificateCreateForm = () => {
             className="space-y-6 rounded-xl border h-fit border-gray-200 bg-white p-6 shadow-sm max-w-3xl mx-auto"
           >
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold">
-                Certificates Create Form
-              </h2>
+              <h2 className="text-xl font-semibold">Certificates Edit Form</h2>
               <p className="text-sm text-muted-foreground">
                 Fill in certificate details
               </p>
@@ -224,13 +250,14 @@ const CertificateCreateForm = () => {
                       </p>
                     </div>
                   ) : (
-                    <div>
-                      <Upload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                      <p className="text-base text-gray-600 mb-2">
-                        Drag and drop or click to upload
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        PNG, JPG, WebP, SVG (Max 2MB)
+                    <div className="relative">
+                      <img
+                        src={data?.data.image}
+                        alt="Certificate image"
+                        className="w-full mx-auto object-cover rounded-lg shadow-sm"
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        Click to change
                       </p>
                     </div>
                   )}
@@ -341,7 +368,7 @@ const CertificateCreateForm = () => {
                   </Button>
                 </div>
 
-                {skills.length > 0 && (
+                {skills?.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
                     {skills.map((skill) => (
                       <Badge
@@ -379,8 +406,8 @@ const CertificateCreateForm = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Saving..." : "Save Certificate"}
+                <Button type="submit" disabled={isUpdateLoading}>
+                  {isUpdateLoading ? "Editing..." : "Edit Certificate"}
                 </Button>
               </div>
             </div>
@@ -389,6 +416,6 @@ const CertificateCreateForm = () => {
       </CardContent>
     </Card>
   );
-}
+};
 
-export default CertificateCreateForm;
+export default CertificateEditForm;

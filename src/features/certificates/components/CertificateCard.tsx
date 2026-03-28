@@ -29,16 +29,13 @@ const CertificateCard = ({
     >
       <div className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
         {/* Certificate Image */}
-        <div className="relative h-[200px] overflow-hidden bg-linear-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900 dark:to-yellow-800">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Award className="w-16 h-16 text-yellow-600 dark:text-yellow-400" />
-          </div>
+        <div className="relative h-[300px] overflow-hidden">
           {image && (
             <Image
               src={image}
               alt={title}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300 opacity-20"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
           )}
         </div>

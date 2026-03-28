@@ -23,31 +23,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "@/i18n/navigation";
+import { api } from "@/services/api";
+import { toast } from "sonner";
+import { useSWRConfig } from "swr";
 
 interface CertificateCardProps {
+  id: string;
   image: string;
   title: string;
-  issuer: string;
-  issueDate: string;
-  expiryDate?: string;
-  credentialId?: string;
-  credentialUrl?: string;
-  verificationUrl?: string;
-  skills: string[];
-  status: "active" | "expired" | "pending";
+  lecture: string;
+  url: string;
+  complete_date: string;
+  technologies: string;
 }
 
 const CertificateCard = ({
+  id,
   image,
   title,
-  issuer,
-  issueDate,
-  expiryDate,
-  credentialId,
-  credentialUrl,
-  verificationUrl,
-  skills,
-  status,
+  lecture,
+  url,
+  complete_date,
+  technologies,
 }: CertificateCardProps) => {
   const certificateVariants: any = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
@@ -62,29 +60,19 @@ const CertificateCard = ({
     },
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "expired":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
+  const { mutate } = useSWRConfig();
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "active":
-        return <CheckCircle className="w-3 h-3" />;
-      case "expired":
-        return <Clock className="w-3 h-3" />;
-      case "pending":
-        return <Clock className="w-3 h-3" />;
-      default:
-        return <CheckCircle className="w-3 h-3" />;
+  const deleteCertificate = async () => {
+    if (!window.confirm("Are you sure you want to delete this certificate?")) {
+      return;
+    }
+    try {
+      await api.delete(`/certificate/${id}`);
+      toast.success("Certificate deleted successfully");
+      mutate("/certificate");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
     }
   };
 
@@ -104,42 +92,16 @@ const CertificateCard = ({
           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
               <div className="flex gap-2">
-                {credentialUrl && (
-                  <Button size="sm" variant="secondary" className="h-8 px-3">
-                    <Eye className="w-3 h-3 mr-1" />
-                    View
-                  </Button>
-                )}
-                {verificationUrl && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 px-3 bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Verify
-                  </Button>
+                {url && (
+                  <Link href={url} target="_blank">
+                    <Button size="sm" variant="secondary" className="h-8 px-3">
+                      <Eye className="w-3 h-3 mr-1" />
+                      View
+                    </Button>
+                  </Link>
                 )}
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 w-8 p-0 text-white hover:bg-white/20"
-              >
-                <Download className="w-4 h-4" />
-              </Button>
             </div>
-          </div>
-
-          {/* Status Badge */}
-          <div className="absolute top-3 left-3">
-            <Badge
-              variant="secondary"
-              className={`bg-black/50 text-white border-none flex items-center gap-1`}
-            >
-              {getStatusIcon(status)}
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
           </div>
 
           {/* Options Menu */}
@@ -155,20 +117,17 @@ const CertificateCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Certificate
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download PDF
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Details
-                </DropdownMenuItem>
+                <Link href={`/dashboard/certificates/edit/${id}`}>
+                  <DropdownMenuItem>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Certificate
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={deleteCertificate}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Certificate
                 </DropdownMenuItem>
@@ -178,7 +137,7 @@ const CertificateCard = ({
         </div>
 
         {/* Certificate Content */}
-        <div className="p-5">
+        <div className="p-5 pb-0">
           {/* Title and Issuer */}
           <div className="mb-4">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1">
@@ -186,7 +145,7 @@ const CertificateCard = ({
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
               <Award className="w-3 h-3" />
-              {issuer}
+              {lecture}
             </p>
           </div>
 
@@ -194,19 +153,13 @@ const CertificateCard = ({
           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mb-4">
             <div className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              <span>Issued: {issueDate}</span>
+              <span>Issued: {complete_date}</span>
             </div>
-            {expiryDate && (
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                <span>Expires: {expiryDate}</span>
-              </div>
-            )}
           </div>
 
           {/* Skills */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {skills.slice(0, 3).map((skill, index) => (
+            {technologies.split("/").map((skill, index) => (
               <Badge
                 key={index}
                 variant="secondary"
@@ -215,36 +168,6 @@ const CertificateCard = ({
                 {skill}
               </Badge>
             ))}
-            {skills.length > 3 && (
-              <Badge variant="outline" className="text-xs px-2 py-1">
-                +{skills.length - 3}
-              </Badge>
-            )}
-          </div>
-
-          {/* Credential ID and Links */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex gap-3">
-              {credentialId && (
-                <span className="font-mono">ID: {credentialId}</span>
-              )}
-              {verificationUrl && (
-                <a
-                  href={verificationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <Globe className="w-3 h-3" />
-                  Verify
-                </a>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <FileText className="w-3 h-3" />
-              <span>Certificate</span>
-            </div>
           </div>
         </div>
       </div>

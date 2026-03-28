@@ -1,10 +1,7 @@
 "use client";
 
 import {
-  Calendar,
   Home,
-  Inbox,
-  Search,
   Settings,
   User,
   FileText,
@@ -68,12 +65,6 @@ export function AdminNav() {
       title: "Certificates",
       url: "/dashboard/certificates",
       icon: Award,
-    },
-
-    {
-      title: "History",
-      url: "/dashboard/history",
-      icon: Logs,
     },
   ];
 
