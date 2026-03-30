@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import CertificateCard from "./CertificateCard";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/i18n/navigation";
 
 interface CertificateCardListProps {
   data: any[];
@@ -41,6 +42,8 @@ const CertificateCardList = ({ data, isLoading }: CertificateCardListProps) => {
     );
   }
 
+  const router = useRouter();
+
   return (
     <motion.div
       variants={containerVariants}
@@ -59,6 +62,7 @@ const CertificateCardList = ({ data, isLoading }: CertificateCardListProps) => {
             url={certificate.url}
             complete_date={certificate.complete_date}
             technologies={certificate.technologies}
+            is_featured={certificate.is_featured}
           />
         ))
       ) : (
@@ -70,7 +74,12 @@ const CertificateCardList = ({ data, isLoading }: CertificateCardListProps) => {
             <p className="text-gray-500 dark:text-gray-400 mb-4">
               Try adjusting your search criteria or add a new certificate.
             </p>
-            <Button size="sm">Add Certificate</Button>
+            <Button
+              onClick={() => router.push("/dashboard/certificates/create")}
+              size="sm"
+            >
+              Add Certificate
+            </Button>
           </div>
         </div>
       )}

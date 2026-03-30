@@ -35,8 +35,8 @@ const CertificatePage = () => {
   }, [query]);
 
   const { data, error, isLoading } = useSWR(
-    `/certificate?q=${debouncedQuery}`,
-    fetcher,
+    ["certificate", debouncedQuery],
+    () => fetcher(`/certificate?q=${debouncedQuery}`),
     {
       revalidateOnFocus: false,
       errorRetryCount: 3,

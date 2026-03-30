@@ -1,196 +1,109 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
-import {
-  Calendar,
-  Users,
-  Clock,
-  Tag,
-  ExternalLink,
-  Github,
-  Globe,
-} from "lucide-react";
+import { Tag, Github, File } from "lucide-react";
 
 interface ProjectDetailInfoProps {
-  duration: string;
-  teamSize: string;
-  status: "completed" | "in-progress" | "maintenance";
-  client?: string;
   role: string;
   technologies: string[];
   frontendLink?: string;
   backendLink?: string;
-  demoLink?: string;
+  docLink?: string;
 }
 
 const ProjectDetailInfo = ({
-  duration,
-  teamSize,
-  status,
-  client,
   role,
   technologies,
   frontendLink,
   backendLink,
-  demoLink,
+  docLink,
 }: ProjectDetailInfoProps) => {
-  const infoVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut",
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
+  const container = {
+    hidden: { opacity: 0, y: 40 },
+    show: {
       opacity: 1,
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        staggerChildren: 0.12,
       },
     },
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-800";
-      case "in-progress":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-800";
-      case "maintenance":
-        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 border-yellow-200 dark:border-yellow-800";
-      default:
-        return "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border-gray-200 dark:border-gray-600";
-    }
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
   };
 
   return (
     <motion.div
-      variants={infoVariants}
+      variants={container}
       initial="hidden"
-      animate="visible"
-      className="grid grid-cols-1 md:grid-cols-2 gap-8"
+      animate="show"
+      className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg border border-gray-100 dark:border-gray-700 space-y-8"
     >
-      {/* Project Information */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700"
-      >
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          Project Information
-        </h3>
-
-        <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <Calendar className="w-5 h-5 text-yellow-500 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                Duration
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {duration}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Users className="w-5 h-5 text-yellow-500 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                Team Size
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {teamSize}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-yellow-500 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                Status
-              </p>
-              <span
-                className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(
-                  status
-                )}`}
-              >
-                {status.replace("-", " ").charAt(0).toUpperCase() +
-                  status.slice(1).replace("-", " ")}
-              </span>
-            </div>
-          </div>
-
-          {client && (
-            <div className="flex items-start gap-3">
-              <Globe className="w-5 h-5 text-yellow-500 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  Client
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {client}
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-start gap-3">
-            <Tag className="w-5 h-5 text-yellow-500 mt-0.5" />
-            <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
-                My Role
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{role}</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
       {/* Technologies */}
-      <motion.div
-        variants={itemVariants}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700"
-      >
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          Technologies Used
+      <motion.div variants={item}>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+          Tech Stack
         </h3>
 
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex flex-wrap gap-2">
           {technologies.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm font-medium rounded-full border border-yellow-200 dark:border-yellow-800"
+              className="px-3 py-1.5 text-sm font-medium rounded-full 
+              bg-gradient-to-r from-yellow-100 to-yellow-50 
+              dark:from-yellow-900/30 dark:to-yellow-800/20 
+              text-yellow-800 dark:text-yellow-200 
+              border border-yellow-200/60 dark:border-yellow-700/40
+              hover:scale-105 transition-transform"
             >
               {tech}
             </span>
           ))}
         </div>
+      </motion.div>
 
-        {/* Project Links */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-            Project Links
-          </h4>
+      {/* Role */}
+      <motion.div variants={item} className="flex items-start gap-4">
+        <div className="p-2 rounded-xl bg-yellow-100 dark:bg-yellow-900/30">
+          <Tag className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+        </div>
 
-          {demoLink && (
+        <div>
+          <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+            My Role
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
+            {role}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Links */}
+      <motion.div variants={item}>
+        <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-3">
+          Project Links
+        </h4>
+
+        <div className="flex flex-col gap-3">
+          {docLink && (
             <a
-              href={demoLink}
+              href={docLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl 
+              bg-gray-50 dark:bg-gray-900 
+              hover:bg-yellow-50 dark:hover:bg-yellow-900/20 
+              transition-all group"
             >
-              <ExternalLink className="w-4 h-4" />
-              Live Demo
+              <div className="flex items-center gap-2">
+                <File className="w-4 h-4 text-gray-500 group-hover:text-yellow-500" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Documentation
+                </span>
+              </div>
             </a>
           )}
 
@@ -199,10 +112,17 @@ const ProjectDetailInfo = ({
               href={frontendLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl 
+              bg-gray-50 dark:bg-gray-900 
+              hover:bg-yellow-50 dark:hover:bg-yellow-900/20 
+              transition-all group"
             >
-              <Github className="w-4 h-4" />
-              Frontend Code
+              <div className="flex items-center gap-2">
+                <Github className="w-4 h-4 text-gray-500 group-hover:text-yellow-500" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Frontend Code
+                </span>
+              </div>
             </a>
           )}
 
@@ -211,10 +131,17 @@ const ProjectDetailInfo = ({
               href={backendLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors"
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl 
+              bg-gray-50 dark:bg-gray-900 
+              hover:bg-yellow-50 dark:hover:bg-yellow-900/20 
+              transition-all group"
             >
-              <Github className="w-4 h-4" />
-              Backend Code
+              <div className="flex items-center gap-2">
+                <Github className="w-4 h-4 text-gray-500 group-hover:text-yellow-500" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  Backend Code
+                </span>
+              </div>
             </a>
           )}
         </div>

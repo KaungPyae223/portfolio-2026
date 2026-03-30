@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, X, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,
@@ -21,7 +21,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { formApi } from "@/services/api";
+import { api, formApi } from "@/services/api";
+import useSWR, { useSWRConfig } from "swr";
+import { fetcher } from "@/services/fetcher";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -58,7 +60,8 @@ const projectSchema = z.object({
     .refine(
       (file) => file.size <= 2 * 1024 * 1024,
       "File size must be less than 2MB",
-    ),
+    )
+    .optional(),
   images: z.array(z.instanceof(File)).optional(),
 });
 
@@ -136,10 +139,12 @@ const MultiTextInput = ({
   );
 };
 
-const ProjectCreateForm = () => {
+const ProjectEditForm = ({ id }: { id: string }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [projectImage, setProjectImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [deletedImages, setDeletedImages] = useState<number[]>([]);
+  const [oldImages, setOldImages] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [galleryPreviews, setGalleryPreviews] = useState<
@@ -166,6 +171,33 @@ const ProjectCreateForm = () => {
       images: [],
     },
   });
+
+  const { data, error } = useSWR(`/project/${id}`, fetcher, {
+    revalidateOnFocus: false,
+    errorRetryCount: 3,
+  });
+
+  useEffect(() => {
+    if (data) {
+      form.reset({
+        name: data.data.name,
+        description: data.data.description,
+        role: data.data.role,
+        demoLink: data.data.demo_url,
+        docLink: data.data.doc_url,
+        frontendLink: data.data.front_end,
+        backendLink: data.data.back_end,
+        technologies: data.data.technologies.split("/"),
+        features: data.data.key_feature.split("/"),
+        challenges: data.data.challenge.split("/"),
+        solutions: data.data.solutions.split("/"),
+      });
+
+      setOldImages(data?.data.detailsImages);
+    }
+  }, [data]);
+
+  console.log(oldImages);
 
   const handleImageUpload = (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -274,7 +306,13 @@ const ProjectCreateForm = () => {
     }
   };
 
+  const { mutate } = useSWRConfig();
+
+  const router = useRouter();
+
   const onSubmit = async (data: z.infer<typeof projectSchema>) => {
+    setIsLoading(true);
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("description", data.description);
@@ -288,7 +326,7 @@ const ProjectCreateForm = () => {
     if (data.challenges)
       formData.append("challenge", data.challenges.join("/"));
     if (data.solutions) formData.append("solutions", data.solutions.join("/"));
-    formData.append("image", data.image);
+    if (data.image) formData.append("image", data.image);
 
     const formImageDetailsData = new FormData();
 
@@ -296,25 +334,26 @@ const ProjectCreateForm = () => {
       data.images.forEach((img) => {
         formImageDetailsData.append("images", img);
       });
+      await formApi.post(`/project/${id}/images`, formImageDetailsData);
     }
 
-    setIsLoading(true);
-
     try {
-      const projectData = await formApi.post("/project", formData);
-      if (projectData.data.id) {
-        await formApi.post(
-          `/project/${projectData.data.id}/images`,
-          formImageDetailsData,
-        );
-      }
+      await formApi.put(`/project/${id}`, formData);
 
-      console.log(projectData);
-      toast.success("Project created successfully");
-      form.reset();
+      await api.delete(`/project/images`, {
+        data: { public_ids: deletedImages },
+      });
+
+      mutate(`/project/${id}`);
+      mutate((key: any) => Array.isArray(key) && key[0] === "project");
+
+      toast.success("Project edited successfully");
+
       setProjectImage(null);
       setGalleryPreviews([]);
       setIsLoading(false);
+
+      router.push("/dashboard/projects");
     } catch (error: any) {
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
@@ -339,7 +378,7 @@ const ProjectCreateForm = () => {
             className="space-y-6 rounded-xl border h-fit border-gray-200 bg-white p-6 shadow-sm max-w-4xl mx-auto"
           >
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold">Project Create Form</h2>
+              <h2 className="text-xl font-semibold">Project Edit Form</h2>
               <p className="text-sm text-muted-foreground">
                 Fill in project details
               </p>
@@ -382,13 +421,11 @@ const ProjectCreateForm = () => {
                     </div>
                   ) : (
                     <div>
-                      <Upload className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                      <p className="text-base text-gray-600 mb-2">
-                        Drag and drop or click to upload cover image
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        PNG, JPG, WebP (Max 2MB)
-                      </p>
+                      <img
+                        src={data?.data.profileImage}
+                        alt="Project cover"
+                        className="w-full mx-auto max-h-64 object-cover rounded-lg shadow-sm"
+                      />
                     </div>
                   )}
                 </div>
@@ -609,9 +646,41 @@ const ProjectCreateForm = () => {
                 className="hidden"
               />
 
-              {galleryPreviews.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-                  {galleryPreviews.map((preview) => (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                {oldImages.length > 0 &&
+                  oldImages.map((image: any) => (
+                    <div
+                      key={image.id}
+                      className="relative group rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={image.url}
+                        alt="Gallery preview"
+                        className="w-full h-32 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletedImages((prev) => [
+                              ...prev,
+                              image.public_id,
+                            ]);
+                            setOldImages(
+                              oldImages.filter((img) => img.id !== image.id),
+                            );
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                {galleryPreviews.length > 0 &&
+                  galleryPreviews.map((preview) => (
                     <div
                       key={preview.id}
                       className="relative group rounded-lg overflow-hidden border"
@@ -636,8 +705,7 @@ const ProjectCreateForm = () => {
                       </div>
                     </div>
                   ))}
-                </div>
-              )}
+              </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-6 border-t mt-8">
@@ -649,7 +717,7 @@ const ProjectCreateForm = () => {
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Project"}
+                {isLoading ? "Editing..." : "Edit Project"}
               </Button>
             </div>
           </form>
@@ -659,4 +727,4 @@ const ProjectCreateForm = () => {
   );
 };
 
-export default ProjectCreateForm;
+export default ProjectEditForm;

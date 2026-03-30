@@ -16,10 +16,11 @@ import {
   Trash2,
   MoreHorizontal,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useSWRConfig } from "swr";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { Switch } from "@/components/ui/switch";
 
 interface CertificateTableProps {
   data: any[];
@@ -36,12 +37,25 @@ const CertificateTable = ({ data, isLoading }: CertificateTableProps) => {
     try {
       await api.delete(`/certificate/${id}`);
       toast.success("Certificate deleted successfully");
-      mutate("/certificate");
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
     } catch (error: any) {
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
     }
   };
+
+  const handleToggleFeatured = async (id: string) => {
+    try {
+      await api.put(`/certificate/featured/${id}`);
+      toast.success("Certificate featured status updated successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  };
+
+  const router = useRouter();
 
   return (
     <div className="rounded-md border">
@@ -60,6 +74,9 @@ const CertificateTable = ({ data, isLoading }: CertificateTableProps) => {
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Skills
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                Is Featured
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-[100px]">
                 Actions
@@ -121,6 +138,14 @@ const CertificateTable = ({ data, isLoading }: CertificateTableProps) => {
                     </div>
                   </td>
                   <td className="p-4 align-middle">
+                    <Switch
+                      checked={certificate.is_featured}
+                      onCheckedChange={() =>
+                        handleToggleFeatured(certificate.id)
+                      }
+                    />
+                  </td>
+                  <td className="p-4 align-middle">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-8 w-8 p-0">
@@ -168,7 +193,14 @@ const CertificateTable = ({ data, isLoading }: CertificateTableProps) => {
                       Try adjusting your search criteria or add a new
                       certificate.
                     </p>
-                    <Button size="sm">Add Certificate</Button>
+                    <Button
+                      onClick={() =>
+                        router.push("/dashboard/certificates/create")
+                      }
+                      size="sm"
+                    >
+                      Add Certificate
+                    </Button>
                   </div>
                 </td>
               </tr>

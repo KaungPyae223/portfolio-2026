@@ -5,8 +5,9 @@ import { ExternalLink, Github, Code, Smartphone, Globe } from "lucide-react";
 import Image from "next/image";
 import ProjectCard from "./HomeProjectCard";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
-const HomeProjects = () => {
+const HomeProjects = ({ projects }: { projects: any[] }) => {
   const t = useTranslations("home");
 
   const titleVariants = {
@@ -31,51 +32,6 @@ const HomeProjects = () => {
       },
     },
   };
-
-  const projects = [
-    {
-      title: "E-Commerce Platform",
-      image:
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-    {
-      title: "Task Management App",
-      image:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-    {
-      title: "Weather Dashboard",
-      image:
-        "https://images.unsplash.com/photo-1592210454359-801627e67647?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-    {
-      title: "Social Media App",
-      image:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-    {
-      title: "Portfolio Website",
-      image:
-        "https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-    {
-      title: "API Management System",
-      image:
-        "https://images.unsplash.com/photo-1558494949-ef010cbcc31c?w=800&h=600&fit=crop",
-      liveUrl: "#",
-      githubUrl: "#",
-    },
-  ];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
@@ -106,7 +62,15 @@ const HomeProjects = () => {
         >
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, index) => (
-              <ProjectCard key={index} title={project.title} />
+              <ProjectCard
+                key={index}
+                image={project.image}
+                title={project.name}
+                description={project.description}
+                keyFeature={project.key_feature.split("/")}
+                tech={project.technologies.split("/")}
+                id={project.id}
+              />
             ))}
           </div>
         </motion.div>
@@ -119,12 +83,12 @@ const HomeProjects = () => {
           viewport={{ once: true, amount: 0.3 }}
         >
           <div className="text-center mt-12">
-            <a
-              href="#"
+            <Link
+              href="/projects"
               className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white dark:text-gray-800 font-medium rounded-full transition-all duration-300"
             >
               {t("view_all_projects")}
-            </a>
+            </Link>
           </div>
         </motion.div>
       </div>

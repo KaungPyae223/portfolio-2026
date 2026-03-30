@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { formApi } from "@/services/api";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher } from "@/services/fetcher";
 
 const certificateSchema = z.object({
@@ -40,6 +40,7 @@ const certificateSchema = z.object({
 });
 
 const CertificateEditForm = ({ id }: { id: string }) => {
+  const { mutate } = useSWRConfig();
   const [currentSkill, setCurrentSkill] = useState("");
   const [certificateImage, setCertificateImage] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -155,6 +156,8 @@ const CertificateEditForm = ({ id }: { id: string }) => {
   const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof certificateSchema>) => {
+    setIsUpdateLoading(true);
+
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("lecture", data.lecture);
@@ -166,15 +169,13 @@ const CertificateEditForm = ({ id }: { id: string }) => {
       formData.append("image", data.image);
     }
 
-    router.push("/dashboard/certificates");
-
-    setIsUpdateLoading(true);
-
     try {
       await formApi.put(`/certificate/${id}`, formData);
       toast.success("Certificate updated successfully");
+      mutate(`/certificate/${id}`);
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
       setIsUpdateLoading(false);
-
+      router.push("/dashboard/certificates");
     } catch (error: any) {
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);

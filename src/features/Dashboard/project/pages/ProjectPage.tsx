@@ -5,27 +5,41 @@ import ProjectCardList from "../components/ProjectCardList";
 import ProjectTableList from "../components/ProjectTableList";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Grid, List, Plus, Search, Filter } from "lucide-react";
+import { useRouter } from "@/i18n/navigation";
+import useSWR from "swr";
+import { fetcher } from "@/services/fetcher";
 
 const ProjectPage = () => {
   const { setTitle, setBreadCrumbContent } = useDashboardStore();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const { data, error, isLoading } = useSWR(
+    ["project", debouncedQuery],
+    () => fetcher(`/project?q=${debouncedQuery}`),
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 3,
+    },
+  );
 
   useEffect(() => {
     setTitle("Projects Management");
     setBreadCrumbContent([]);
   }, []);
+
+  const router = useRouter();
 
   return (
     <div className="space-y-6 p-6">
@@ -38,11 +52,10 @@ const ProjectPage = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
-          <Button size="sm">
+          <Button
+            onClick={() => router.push("/dashboard/projects/create")}
+            size="sm"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add Project
           </Button>
@@ -54,8 +67,8 @@ const ProjectPage = () => {
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           placeholder="Search projects..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           className="pl-10"
         />
       </div>
@@ -74,11 +87,11 @@ const ProjectPage = () => {
         </TabsList>
 
         <TabsContent value="grid" className="space-y-4">
-          <ProjectCardList searchQuery={searchQuery} />
+          <ProjectCardList data={data?.data} isLoading={isLoading} />
         </TabsContent>
 
         <TabsContent value="table" className="space-y-4">
-          <ProjectTableList searchQuery={searchQuery} />
+          <ProjectTableList data={data?.data} isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

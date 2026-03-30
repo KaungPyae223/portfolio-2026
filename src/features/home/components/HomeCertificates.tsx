@@ -3,9 +3,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import CertificateCard from "./HomeCertificateCard";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
-const HomeCertificates = () => {
+const HomeCertificates = ({ certificates }: { certificates: any }) => {
   const t = useTranslations("home");
+
+  console.log(certificates);
 
   const titleVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -29,58 +32,6 @@ const HomeCertificates = () => {
       },
     },
   };
-
-  const certificates = [
-    {
-      title: "AWS Certified Solutions Architect",
-      issuer: "Amazon Web Services",
-      date: "March 2024",
-      image: "",
-      credentialUrl: "https://aws.amazon.com/certification/",
-      skills: ["AWS", "Cloud Architecture", "Lambda", "EC2", "S3"],
-    },
-    {
-      title: "Google Cloud Professional Developer",
-      issuer: "Google Cloud",
-      date: "February 2024",
-      image: "",
-      credentialUrl: "https://cloud.google.com/certification",
-      skills: ["GCP", "Cloud Run", "Firestore", "Compute Engine"],
-    },
-    {
-      title: "Meta Frontend Developer Certificate",
-      issuer: "Meta",
-      date: "January 2024",
-      image: "",
-      credentialUrl:
-        "https://www.coursera.org/professional-certificates/meta-front-end-developer",
-      skills: ["React", "JavaScript", "HTML/CSS", "UI/UX"],
-    },
-    {
-      title: "MongoDB Certified Developer",
-      issuer: "MongoDB",
-      date: "December 2023",
-      image: "",
-      credentialUrl: "https://university.mongodb.com/",
-      skills: ["MongoDB", "NoSQL", "Database Design", "Mongoose"],
-    },
-    {
-      title: "Docker Certified Associate",
-      issuer: "Docker",
-      date: "November 2023",
-      image: "",
-      credentialUrl: "https://www.docker.com/certification/",
-      skills: ["Docker", "Containers", "Kubernetes", "DevOps"],
-    },
-    {
-      title: "Advanced React and Redux",
-      issuer: "Udemy",
-      date: "October 2023",
-      image: "",
-      credentialUrl: "https://www.udemy.com/course/react-redux/",
-      skills: ["React", "Redux", "Hooks", "State Management"],
-    },
-  ];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden ">
@@ -110,15 +61,15 @@ const HomeCertificates = () => {
           variants={containerVariants}
         >
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {certificates.map((certificate, index) => (
+            {certificates.map((certificate: any, index: number) => (
               <CertificateCard
                 key={index}
                 title={certificate.title}
-                issuer={certificate.issuer}
-                date={certificate.date}
+                issuer={certificate.lecture}
+                date={certificate.complete_date}
                 image={certificate.image}
-                credentialUrl={certificate.credentialUrl}
-                skills={certificate.skills}
+                credentialUrl={certificate.url}
+                skills={certificate.technologies.split(",")}
               />
             ))}
           </div>
@@ -132,12 +83,12 @@ const HomeCertificates = () => {
           viewport={{ once: true }}
         >
           <div className="text-center mt-16">
-            <a
-              href="#"
+            <Link
+              href="/certificates"
               className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white dark:text-gray-800 font-medium rounded-full transition-all duration-300"
             >
               {t("view_all_certificates")}
-            </a>
+            </Link>
           </div>
         </motion.div>
       </div>

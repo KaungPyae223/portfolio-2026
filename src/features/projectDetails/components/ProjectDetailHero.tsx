@@ -10,8 +10,6 @@ interface ProjectDetailHeroProps {
   description: string;
   image: string;
   demoLink?: string;
-  githubLink?: string;
-  category: string;
 }
 
 const ProjectDetailHero = ({
@@ -19,8 +17,6 @@ const ProjectDetailHero = ({
   description,
   image,
   demoLink,
-  githubLink,
-  category,
 }: ProjectDetailHeroProps) => {
   const heroVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -81,11 +77,6 @@ const ProjectDetailHero = ({
         {/* Main Content */}
         <div className="space-y-6">
           <motion.div variants={itemVariants}>
-            <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-sm font-medium rounded-full border border-yellow-500/30">
-                {category}
-              </span>
-            </div>
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               {title}
             </h1>
@@ -105,17 +96,6 @@ const ProjectDetailHero = ({
               >
                 <ExternalLink className="w-5 h-5" />
                 <span>Live Demo</span>
-              </a>
-            )}
-            {githubLink && (
-              <a
-                href={githubLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded-xl font-semibold border border-gray-700 transition-all transform hover:scale-105"
-              >
-                <Github className="w-5 h-5" />
-                <span>View Code</span>
               </a>
             )}
           </motion.div>

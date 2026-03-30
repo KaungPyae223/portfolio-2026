@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, X, Upload } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   Form,
   FormControl,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { formApi } from "@/services/api";
+import { useSWRConfig } from "swr";
 
 const certificateSchema = z.object({
   title: z.string().min(1, "Certificate title is required"),
@@ -37,6 +38,8 @@ const certificateSchema = z.object({
 });
 
 const CertificateCreateForm = () => {
+  const { mutate } = useSWRConfig();
+  const router = useRouter();
   const [currentSkill, setCurrentSkill] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [certificateImage, setCertificateImage] = useState<string | null>(null);
@@ -144,6 +147,8 @@ const CertificateCreateForm = () => {
     try {
       await formApi.post("/certificate", formData);
       toast.success("Certificate created successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
+      router.push("/dashboard/certificates");
       form.reset();
       setCertificateImage(null);
       setIsLoading(false);
@@ -389,6 +394,6 @@ const CertificateCreateForm = () => {
       </CardContent>
     </Card>
   );
-}
+};
 
 export default CertificateCreateForm;

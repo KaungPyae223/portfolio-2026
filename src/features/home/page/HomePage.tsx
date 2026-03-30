@@ -54,8 +54,8 @@ const HomePage = () => {
           cvURL={data?.data.cvURL}
         />
         <HomeSkills skills={data?.data.skills} />
-        <HomeProjects />
-        <HomeCertificates />
+        <HomeProjects projects={data?.data.projects} />
+        <HomeCertificates certificates={data?.data.certificates} />
         <HomeContact
           profileURL={data?.data.profileURL}
           name={data?.data.name}

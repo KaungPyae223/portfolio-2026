@@ -1,16 +1,24 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useDetailsStore } from "@/store/useDetailsStore";
-import {
-  ExternalLink,
-  Github,
-  Code,
-  Smartphone,
-  Globe,
-  Star,
-} from "lucide-react";
 
-const HomeProjectCard = ({ title }: { title: string }) => {
+import { useRouter } from "@/i18n/navigation";
+
+const HomeProjectCard = ({
+  title,
+  description,
+  keyFeature,
+  tech,
+  id,
+  image,
+}: {
+  title: string;
+  description: string;
+  keyFeature: string[];
+  tech: string[];
+  id: number;
+  image: string;
+}) => {
   const { setDetailsContent, detailsContent } = useDetailsStore();
 
   const projectVariants = {
@@ -28,38 +36,19 @@ const HomeProjectCard = ({ title }: { title: string }) => {
 
   const project = {
     title: title,
-    description:
-      "A full-featured e-commerce platform with modern UI/UX design, secure payment processing, and comprehensive admin dashboard.",
-    image:
-      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-    technologies: ["Next.js", "React", "Node.js", "MongoDB", "Stripe"],
-    features: [
-      "User Authentication",
-      "Shopping Cart",
-      "Payment Gateway",
-      "Admin Dashboard",
-      "Real-time Notifications",
-    ],
-    liveUrl: "#",
-    githubUrl: "#",
-    stars: 42,
+    description: description,
+    image: image,
+    technologies: tech,
+    features: keyFeature,
   };
 
-  const getIcon = (tech: string) => {
-    const techIcons: { [key: string]: JSX.Element } = {
-      "Next.js": <Code className="w-4 h-4" />,
-      React: <Code className="w-4 h-4" />,
-      "Node.js": <Globe className="w-4 h-4" />,
-      MongoDB: <Globe className="w-4 h-4" />,
-      Stripe: <Star className="w-4 h-4" />,
-      "Express.js": <Code className="w-4 h-4" />,
-      MySQL: <Globe className="w-4 h-4" />,
-    };
-    return techIcons[tech] || <Code className="w-4 h-4" />;
-  };
+  const router = useRouter();
 
   return (
-    <motion.div variants={projectVariants}>
+    <motion.div
+      variants={projectVariants}
+      onClick={() => router.push(`/projects/${id}`)}
+    >
       <div
         onMouseEnter={() => setDetailsContent(project)}
         onMouseLeave={() => setDetailsContent(null)}

@@ -13,6 +13,7 @@ import {
   CheckCircle,
   Clock,
   Globe,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +37,7 @@ interface CertificateCardProps {
   url: string;
   complete_date: string;
   technologies: string;
+  is_featured?: boolean;
 }
 
 const CertificateCard = ({
@@ -46,6 +48,7 @@ const CertificateCard = ({
   url,
   complete_date,
   technologies,
+  is_featured = false,
 }: CertificateCardProps) => {
   const certificateVariants: any = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
@@ -69,7 +72,18 @@ const CertificateCard = ({
     try {
       await api.delete(`/certificate/${id}`);
       toast.success("Certificate deleted successfully");
-      mutate("/certificate");
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  };
+ 
+  const handleToggleFeatured = async () => {
+    try {
+      await api.put(`/certificate/featured/${id}`);
+      toast.success("Certificate featured status updated successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "certificate");
     } catch (error: any) {
       const message = error.response?.data?.message || "Something went wrong";
       toast.error(message);
@@ -104,6 +118,26 @@ const CertificateCard = ({
             </div>
           </div>
 
+ 
+          {/* Featured Toggle */}
+          <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 w-8 p-0 rounded-full shadow-lg transition-all duration-300 ${
+                is_featured 
+                ? "bg-yellow-400 text-white hover:bg-yellow-500 scale-110" 
+                : "bg-black/50 text-white hover:bg-black/70"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFeatured();
+              }}
+            >
+              <Star className={`w-4 h-4 ${is_featured ? "fill-current" : ""}`} />
+            </Button>
+          </div>
+ 
           {/* Options Menu */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <DropdownMenu>

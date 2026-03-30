@@ -1,20 +1,6 @@
 import Image from "next/image";
-import { motion } from "framer-motion";
-import {
-  ExternalLink,
-  Github,
-  Code,
-  Smartphone,
-  Globe,
-  Star,
-  Expand,
-  Edit,
-  Trash2,
-  Eye,
-  Heart,
-  MoreVertical,
-} from "lucide-react";
-import Link from "next/link";
+import { Star, Edit, Trash2, Eye, MoreVertical } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,6 +10,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { api } from "@/services/api";
+import { useSWRConfig } from "swr";
+import { motion } from "framer-motion";
 
 interface ProjectCardProps {
   image: string;
@@ -33,9 +23,13 @@ interface ProjectCardProps {
   backendLink?: string;
   demoLink?: string;
   tech: string[];
+  id: string;
+  is_featured?: boolean;
+  documentLink?: string;
 }
 
 const ProjectCard = ({
+  id,
   image,
   title,
   description,
@@ -43,6 +37,8 @@ const ProjectCard = ({
   backendLink,
   demoLink,
   tech,
+  is_featured,
+  documentLink,
 }: ProjectCardProps) => {
   const projectVariants: any = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
@@ -57,38 +53,31 @@ const ProjectCard = ({
     },
   };
 
-  const getIcon = (techName: string) => {
-    const techIcons: Record<string, React.ReactNode> = {
-      React: <Code className="w-4 h-4" />,
-      "Next.js": <Code className="w-4 h-4" />,
-      "Vue.js": <Code className="w-4 h-4" />,
-      Angular: <Code className="w-4 h-4" />,
-      "Nuxt.js": <Code className="w-4 h-4" />,
-      "Node.js": <Globe className="w-4 h-4" />,
-      Express: <Globe className="w-4 h-4" />,
-      Django: <Globe className="w-4 h-4" />,
-      Python: <Code className="w-4 h-4" />,
-      MongoDB: <Globe className="w-4 h-4" />,
-      PostgreSQL: <Globe className="w-4 h-4" />,
-      MySQL: <Globe className="w-4 h-4" />,
-      Redis: <Globe className="w-4 h-4" />,
-      Firebase: <Star className="w-4 h-4" />,
-      AWS: <Globe className="w-4 h-4" />,
-      Docker: <Code className="w-4 h-4" />,
-      Kubernetes: <Code className="w-4 h-4" />,
-      "Socket.io": <Globe className="w-4 h-4" />,
-      WebRTC: <Smartphone className="w-4 h-4" />,
-      "React Native": <Smartphone className="w-4 h-4" />,
-      Stripe: <Star className="w-4 h-4" />,
-      TailwindCSS: <Code className="w-4 h-4" />,
-      "Framer-Motion": <Code className="w-4 h-4" />,
-      "Three.js": <Code className="w-4 h-4" />,
-      "D3.js": <Code className="w-4 h-4" />,
-      "Chart.js": <Code className="w-4 h-4" />,
-      Strapi: <Globe className="w-4 h-4" />,
-      FastAPI: <Code className="w-4 h-4" />,
-    };
-    return techIcons[techName] || <Code className="w-4 h-4" />;
+  const { mutate } = useSWRConfig();
+
+  const handleToggleFeatured = async () => {
+    try {
+      await api.put(`/project/featured/${id}`);
+      toast.success("Project featured status updated successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "project");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  };
+
+  const deleteProject = async () => {
+    if (!window.confirm("Are you sure you want to delete this project?")) {
+      return;
+    }
+    try {
+      await api.delete(`/project/${id}`);
+      toast.success("Project deleted successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "project");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   };
 
   return (
@@ -103,45 +92,38 @@ const ProjectCard = ({
             className="object-cover group-hover:scale-105 transition-transform duration-700"
           />
 
-          {/* Quick Actions Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-              <div className="flex gap-2">
-                {demoLink && (
+          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <div className="flex gap-2">
+              {demoLink && (
+                <Link href={demoLink} target="_blank">
                   <Button size="sm" variant="secondary" className="h-8 px-3">
                     <Eye className="w-3 h-3 mr-1" />
-                    Demo
+                    View
                   </Button>
-                )}
-                {frontendLink && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 px-3 bg-white/10 border-white/20 text-white hover:bg-white/20"
-                  >
-                    <Github className="w-3 h-3 mr-1" />
-                    Code
-                  </Button>
-                )}
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 w-8 p-0 text-white hover:bg-white/20"
-              >
-                <Heart className="w-4 h-4" />
-              </Button>
+                </Link>
+              )}
             </div>
           </div>
 
-          {/* Project Type Badge */}
-          <div className="absolute top-3 left-3">
-            <Badge
-              variant="secondary"
-              className="bg-black/50 text-white border-none"
+          <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`h-8 w-8 p-0 rounded-full shadow-lg transition-all duration-300 ${
+                is_featured
+                  ? "bg-yellow-400 text-white hover:bg-yellow-500 scale-110"
+                  : "bg-black/50 text-white hover:bg-black/70"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFeatured();
+              }}
             >
-              Featured
-            </Badge>
+              <Star
+                className={`w-4 h-4 ${is_featured ? "fill-current" : ""}`}
+              />
+            </Button>
           </div>
 
           {/* Options Menu */}
@@ -151,22 +133,30 @@ const ProjectCard = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 bg-black/50 text-white hover:bg-black/70"
+                  className="h-8 w-8 p-0 bg-black/50 text-white hover:bg-black/70 z-10"
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit Project
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  View Details
-                </DropdownMenuItem>
+                <Link href={`/projects/${id}`}>
+                  <DropdownMenuItem>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                </Link>
+                <Link href={`/dashboard/projects/edit/${id}`}>
+                  <DropdownMenuItem>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit Project
+                  </DropdownMenuItem>
+                </Link>
+
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">
+                <DropdownMenuItem
+                  className="text-red-600"
+                  onClick={deleteProject}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Delete Project
                 </DropdownMenuItem>
@@ -230,10 +220,17 @@ const ProjectCard = ({
                   Backend
                 </a>
               )}
-            </div>
-            <div className="flex items-center gap-1">
-              <Eye className="w-3 h-3" />
-              <span>1.2k</span>
+              {documentLink && (
+                <a
+                  href={documentLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Document
+                </a>
+              )}
             </div>
           </div>
         </div>

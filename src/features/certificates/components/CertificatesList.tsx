@@ -11,6 +11,7 @@ const CertificatesList = () => {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [showData, setShowData] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,14 +21,20 @@ const CertificatesList = () => {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const { data, error, isLoading } = useSWR(
-    `/certificate?q=${debouncedQuery}`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      errorRetryCount: 3,
-    },
-  );
+  const { data, error, isLoading } = useSWR(`/certificate`, fetcher, {
+    revalidateOnFocus: false,
+    errorRetryCount: 3,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setShowData(
+        data.data.filter((item: any) =>
+          item.title.toLowerCase().includes(debouncedQuery.toLowerCase()),
+        ),
+      );
+    }
+  }, [data, debouncedQuery]);
 
   if (isLoading) {
     return (
@@ -92,8 +99,8 @@ const CertificatesList = () => {
       >
         <div className="grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 pb-6">
           <AnimatePresence mode="wait">
-            {data?.data.length > 0 ? (
-              data?.data.map((certificate: any, index: number) => (
+            {showData.length > 0 ? (
+              showData.map((certificate: any, index: number) => (
                 <motion.div
                   key={certificate.id}
                   initial={{ opacity: 0, scale: 0.9, y: 20 }}

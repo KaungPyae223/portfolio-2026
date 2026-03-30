@@ -21,105 +21,54 @@ import {
   Star,
 } from "lucide-react";
 
+import { Link, useRouter } from "@/i18n/navigation";
+import { Switch } from "@/components/ui/switch";
+import { api } from "@/services/api";
+import { toast } from "sonner";
+import { useSWRConfig } from "swr";
+
 interface ProjectTableListProps {
-  searchQuery?: string;
+  data: any[];
+  isLoading: boolean;
 }
 
-const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
-  type ProjectItem = {
-    id: number;
-    image: string;
-    name: string;
-    description: string;
-    frontend: string;
-    backend: string;
-    demo: string;
-    tech: string;
-    type: string;
+const ProjectTableList = ({ data, isLoading }: ProjectTableListProps) => {
+  const router = useRouter();
+
+  const { mutate } = useSWRConfig();
+
+  const handleToggleFeatured = async (id: string) => {
+    try {
+      await api.put(`/project/featured/${id}`);
+      toast.success("Project featured status updated successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "project");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
   };
 
-  // Sample project data
-  const data: ProjectItem[] = [
-    {
-      id: 1,
-      image:
-        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-      name: "E-Commerce Platform",
-      description:
-        "A full-featured e-commerce platform with modern UI/UX design, secure payment processing, and comprehensive admin dashboard.",
-      frontend: "https://github.com/example/ecommerce-frontend",
-      backend: "https://github.com/example/ecommerce-backend",
-      demo: "https://ecommerce-demo.com",
-      tech: "React/Node.js/MongoDB/Stripe/TailwindCSS",
-      type: "fullstack",
-    },
-    {
-      id: 2,
-      image:
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=600&fit=crop",
-      name: "Task Management App",
-      description:
-        "A collaborative task management application with real-time updates, drag-and-drop functionality, and team collaboration features.",
-      frontend: "https://github.com/example/taskmanager-frontend",
-      backend: "https://github.com/example/taskmanager-backend",
-      demo: "https://taskmanager-demo.com",
-      tech: "Next.js/Express/PostgreSQL/Socket.io",
-      type: "fullstack",
-    },
-    {
-      id: 3,
-      image:
-        "https://images.unsplash.com/photo-1592210454359-801627e67647?w=800&h=600&fit=crop",
-      name: "Weather Dashboard",
-      description:
-        "A beautiful weather dashboard with real-time data, interactive maps, and detailed forecasts for multiple locations.",
-      frontend: "https://github.com/example/weather-frontend",
-      backend: "https://github.com/example/weather-api",
-      demo: "https://weather-demo.com",
-      tech: "Vue.js/Node.js/Redis/Chart.js",
-      type: "frontend",
-    },
-  ];
+  const deleteProject = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) {
+      return;
+    }
+    try {
+      await api.delete(`/project/${id}`);
+      toast.success("Project deleted successfully");
+      mutate((key: any) => Array.isArray(key) && key[0] === "project");
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  };
 
-  // Filter projects based on search query
-  const filteredProjects = useMemo(() => {
-    if (!searchQuery.trim()) return data;
-
-    const query = searchQuery.toLowerCase();
-    return data.filter(
-      (project) =>
-        project.name.toLowerCase().includes(query) ||
-        project.description.toLowerCase().includes(query) ||
-        project.tech.toLowerCase().includes(query) ||
-        project.type.toLowerCase().includes(query)
+  if (isLoading) {
+    return (
+      <div className="h-40 flex items-center justify-center">
+        Loading Projects...
+      </div>
     );
-  }, [searchQuery]);
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "frontend":
-        return <Code className="w-4 h-4" />;
-      case "backend":
-        return <Globe className="w-4 h-4" />;
-      case "mobile":
-        return <Smartphone className="w-4 h-4" />;
-      default:
-        return <Star className="w-4 h-4" />;
-    }
-  };
-
-  const getTypeBadgeVariant = (type: string) => {
-    switch (type) {
-      case "frontend":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      case "backend":
-        return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      case "mobile":
-        return "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-    }
-  };
+  }
 
   return (
     <div className="rounded-md border">
@@ -130,14 +79,15 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Project
               </th>
-              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
-                Type
-              </th>
+
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Technologies
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
                 Links
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                Is Featured
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground w-[100px]">
                 Actions
@@ -145,8 +95,8 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
             </tr>
           </thead>
           <tbody>
-            {filteredProjects.length > 0 ? (
-              filteredProjects.map((project) => (
+            {data?.length > 0 ? (
+              data.map((project) => (
                 <tr
                   key={project.id}
                   className="border-b transition-colors hover:bg-muted/50"
@@ -169,22 +119,11 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
                     </div>
                   </td>
                   <td className="p-4 align-middle">
-                    <Badge
-                      variant="secondary"
-                      className={`flex items-center gap-1 w-fit ${getTypeBadgeVariant(
-                        project.type
-                      )}`}
-                    >
-                      {getTypeIcon(project.type)}
-                      {project.type}
-                    </Badge>
-                  </td>
-                  <td className="p-4 align-middle">
                     <div className="flex flex-wrap gap-1">
-                      {project.tech
-                        .split("/")
+                      {project.technologies
+                        ?.split("/")
                         .slice(0, 3)
-                        .map((tech, index) => (
+                        .map((tech: string, index: number) => (
                           <Badge
                             key={index}
                             variant="outline"
@@ -193,7 +132,7 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
                             {tech}
                           </Badge>
                         ))}
-                      {project.tech.split("/").length > 3 && (
+                      {project.tech?.split("/").length > 3 && (
                         <Badge variant="outline" className="text-xs">
                           +{project.tech.split("/").length - 3}
                         </Badge>
@@ -202,22 +141,47 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
                   </td>
                   <td className="p-4 align-middle">
                     <div className="flex items-center gap-2">
-                      {project.demo && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-2"
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          Demo
-                        </Button>
+                      {project.demo_url && (
+                        <a href={project.demo_url} target="_blank">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 px-2"
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            Demo
+                          </Button>
+                        </a>
                       )}
-                      {project.frontend && (
-                        <Button size="sm" variant="ghost" className="h-8 px-2">
-                          <Github className="w-3 h-3" />
-                        </Button>
+                      {project.front_end && (
+                        <a href={project.front_end} target="_blank">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2"
+                          >
+                            Frontend
+                          </Button>
+                        </a>
+                      )}
+                      {project.back_end && (
+                        <a href={project.back_end} target="_blank">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2"
+                          >
+                            Backend
+                          </Button>
+                        </a>
                       )}
                     </div>
+                  </td>
+                  <td className="p-4 align-middle">
+                    <Switch
+                      checked={project.is_featured}
+                      onCheckedChange={() => handleToggleFeatured(project.id)}
+                    />
                   </td>
                   <td className="p-4 align-middle">
                     <DropdownMenu>
@@ -227,16 +191,21 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
+                        <Link href={`/projects/${project.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Project
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => deleteProject(project.id)}
+                        >
                           <Trash2 className="w-4 h-4 mr-2" />
                           Delete Project
                         </DropdownMenuItem>
@@ -256,7 +225,12 @@ const ProjectTableList = ({ searchQuery = "" }: ProjectTableListProps) => {
                       Try adjusting your search criteria or create a new
                       project.
                     </p>
-                    <Button size="sm">Create New Project</Button>
+                    <Button
+                      onClick={() => router.push("/dashboard/projects/create")}
+                      size="sm"
+                    >
+                      Add Project
+                    </Button>
                   </div>
                 </td>
               </tr>
