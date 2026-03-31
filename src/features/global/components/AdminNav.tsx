@@ -10,6 +10,7 @@ import {
   Globe,
   Award,
   Logs,
+  Key,
 } from "lucide-react";
 
 import {
@@ -38,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import { api } from "@/services/api";
 
 export function AdminNav() {
   const navigationItems = [
@@ -66,6 +68,11 @@ export function AdminNav() {
       url: "/dashboard/certificates",
       icon: Award,
     },
+    {
+      title: "Change Password",
+      url: "/dashboard/change-password",
+      icon: Key,
+    },
   ];
 
   const settingsItems = [
@@ -81,6 +88,15 @@ export function AdminNav() {
   const router = useRouter();
 
   const param = useSearchParams();
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/logout");
+      router.push("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Sidebar>
@@ -160,9 +176,10 @@ export function AdminNav() {
         <Button
           variant="ghost"
           className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={handleLogout}
         >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>Logout</span>
         </Button>
       </SidebarFooter>
 

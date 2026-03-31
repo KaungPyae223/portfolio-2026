@@ -1,4 +1,4 @@
-import CertificateEditPage from "@/features/Dashboard/Certificates/pages/CertificateEditPage";
+import CertificateEditPage from "@/features/Dashboard/certificates/pages/CertificateEditPage";
 
 export default async function EditCertificatePage({
   params,

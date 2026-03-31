@@ -1,12 +1,7 @@
 "use client";
 
-import CertificateCreatePage from "@/features/Dashboard/Certificates/pages/CertificateCreatePage";
-
+import CertificateCreatePage from "@/features/Dashboard/certificates/pages/CertificateCreatePage";
 
 export default function CreateCertificatePage() {
-
-
-  return (
-    <CertificateCreatePage/>
-  );
+  return <CertificateCreatePage />;
 }

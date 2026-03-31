@@ -1,10 +1,8 @@
-import CertificatePage from '@/features/Dashboard/Certificates/pages/CertificatePage'
-import React from 'react'
+import CertificatePage from "@/features/Dashboard/certificates/pages/CertificatePage";
+import React from "react";
 
 const page = () => {
-  return (
-    <CertificatePage/>
-  )
-}
+  return <CertificatePage />;
+};
 
-export default page
+export default page;
