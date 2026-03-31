@@ -28,6 +28,7 @@ import { Link } from "@/i18n/navigation";
 import { api } from "@/services/api";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
+import { easeOut } from "framer-motion";
 
 interface CertificateCardProps {
   id: string;
@@ -58,7 +59,7 @@ const CertificateCard = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };
@@ -78,7 +79,7 @@ const CertificateCard = ({
       toast.error(message);
     }
   };
- 
+
   const handleToggleFeatured = async () => {
     try {
       await api.put(`/certificate/featured/${id}`);
@@ -118,26 +119,27 @@ const CertificateCard = ({
             </div>
           </div>
 
- 
           {/* Featured Toggle */}
           <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Button
               variant="ghost"
               size="sm"
               className={`h-8 w-8 p-0 rounded-full shadow-lg transition-all duration-300 ${
-                is_featured 
-                ? "bg-yellow-400 text-white hover:bg-yellow-500 scale-110" 
-                : "bg-black/50 text-white hover:bg-black/70"
+                is_featured
+                  ? "bg-yellow-400 text-white hover:bg-yellow-500 scale-110"
+                  : "bg-black/50 text-white hover:bg-black/70"
               }`}
               onClick={(e) => {
                 e.stopPropagation();
                 handleToggleFeatured();
               }}
             >
-              <Star className={`w-4 h-4 ${is_featured ? "fill-current" : ""}`} />
+              <Star
+                className={`w-4 h-4 ${is_featured ? "fill-current" : ""}`}
+              />
             </Button>
           </div>
- 
+
           {/* Options Menu */}
           <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <DropdownMenu>

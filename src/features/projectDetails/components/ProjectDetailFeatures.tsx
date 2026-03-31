@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "framer-motion";
+import { easeOut } from "framer-motion";
 
 interface ProjectDetailFeaturesProps {
   features: string[];
@@ -19,7 +20,7 @@ const ProjectDetailFeatures = ({
       opacity: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
         staggerChildren: 0.2,
       },
     },
@@ -32,7 +33,7 @@ const ProjectDetailFeatures = ({
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { api } from "@/services/api";
 import { useSWRConfig } from "swr";
 import { motion } from "framer-motion";
+import { easeOut } from "framer-motion";
 
 interface ProjectCardProps {
   image: string;
@@ -48,7 +49,7 @@ const ProjectCard = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

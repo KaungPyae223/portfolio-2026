@@ -25,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 
 const CVInfo = ({ allCVs }: { allCVs: any }) => {
   const japaneseCV = allCVs?.find(
-    (data: any) => data.category == "cv-Japanese"
+    (data: any) => data.category == "cv-Japanese",
   );
 
   const englishCV = allCVs?.find((data: any) => data.category == "cv-English");
@@ -47,7 +47,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
 
   const downloadCV = async (
     url: string,
-    filename = "kaung pyae aung cv.pdf"
+    filename = "kaung pyae aung cv.pdf",
   ) => {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -62,7 +62,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
 
   const handleFileUpload = async (
     files: FileList | null,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => {
     if (!files || files.length === 0) return;
 
@@ -93,7 +93,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
       toast.success(
         `${
           language === "Japanese" ? "Japanese" : "English"
-        } CV uploaded successfully`
+        } CV uploaded successfully`,
       );
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to upload CV";
@@ -105,7 +105,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
 
   const handleDragOver = (
     e: React.DragEvent,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => {
     e.preventDefault();
     setIsDragging((prev) => ({ ...prev, [language]: true }));
@@ -113,7 +113,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
 
   const handleDragLeave = (
     e: React.DragEvent,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => {
     e.preventDefault();
     setIsDragging((prev) => ({ ...prev, [language]: false }));
@@ -130,7 +130,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
       !window.confirm(
         `Are you sure you want to delete your ${
           language === "Japanese" ? "Japanese" : "English"
-        } CV?`
+        } CV?`,
       )
     ) {
       return;
@@ -147,7 +147,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
       toast.success(
         `${
           language === "Japanese" ? "Japanese" : "English"
-        } CV deleted successfully`
+        } CV deleted successfully`,
       );
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to delete CV";
@@ -201,7 +201,7 @@ const CVInfo = ({ allCVs }: { allCVs: any }) => {
           handleDragOver={handleDragOver}
           handleDragLeave={handleDragLeave}
           handleDrop={handleDrop}
-          fileInputRef={EnglishFileInputRef}
+          fileInputRef={JapaneseFileInputRef}
           handleFileUpload={handleFileUpload}
           language="Japanese"
         />
@@ -240,17 +240,17 @@ const UploadArea = ({
   isUploading: any;
   handleDragOver: (
     e: React.DragEvent,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => void;
   handleDragLeave: (
     e: React.DragEvent,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => void;
   handleDrop: (e: React.DragEvent, language: "Japanese" | "English") => void;
-  fileInputRef: Ref<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileUpload: (
     files: FileList | null,
-    language: "Japanese" | "English"
+    language: "Japanese" | "English",
   ) => void;
   language: "Japanese" | "English";
 }) => {
@@ -266,8 +266,8 @@ const UploadArea = ({
           isDragging[language]
             ? "border-blue-400 bg-blue-50 scale-[1.02]"
             : isUploading[language]
-            ? "border-blue-400 bg-blue-50"
-            : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
+              ? "border-blue-400 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400 hover:bg-gray-50"
         }`}
         onDragOver={(e) => handleDragOver(e, language)}
         onDragLeave={(e) => handleDragLeave(e, language)}
@@ -287,8 +287,8 @@ const UploadArea = ({
             isUploading[language]
               ? "text-blue-400"
               : isDragging[language]
-              ? "text-blue-500"
-              : "text-gray-400"
+                ? "text-blue-500"
+                : "text-gray-400"
           }`}
         />
         <p
@@ -296,15 +296,15 @@ const UploadArea = ({
             isUploading[language]
               ? "text-blue-600"
               : isDragging[language]
-              ? "text-blue-600"
-              : "text-gray-600"
+                ? "text-blue-600"
+                : "text-gray-600"
           }`}
         >
           {isUploading[language]
             ? `Processing your ${language} CV...`
             : isDragging[language]
-            ? `Drop your ${language} CV here`
-            : `Drag and drop your ${language} CV here, or click to browse`}
+              ? `Drop your ${language} CV here`
+              : `Drag and drop your ${language} CV here, or click to browse`}
         </p>
         <p className="text-xs text-gray-500 mb-4">PDF files only (Max 10MB)</p>
         <Button

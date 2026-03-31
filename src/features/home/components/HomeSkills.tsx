@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { easeOut } from "framer-motion";
 
 const HomeSkills = ({ skills }: { skills: any }) => {
   const t = useTranslations("home");
@@ -26,7 +27,7 @@ const HomeSkills = ({ skills }: { skills: any }) => {
       scale: 1,
       transition: {
         duration: 0.5,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };
@@ -38,7 +39,7 @@ const HomeSkills = ({ skills }: { skills: any }) => {
       y: 0,
       transition: {
         duration: 1.2,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

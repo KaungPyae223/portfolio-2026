@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import CertificateCard from "./HomeCertificateCard";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { easeOut } from "framer-motion";
 
 const HomeCertificates = ({ certificates }: { certificates: any }) => {
   const t = useTranslations("home");
@@ -17,7 +18,7 @@ const HomeCertificates = ({ certificates }: { certificates: any }) => {
       y: 0,
       transition: {
         duration: 1.2,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

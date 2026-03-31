@@ -2,6 +2,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { easeOut } from "framer-motion";
 
 interface ProjectCardProps {
   id: string;
@@ -32,7 +33,7 @@ const ProjectCard = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

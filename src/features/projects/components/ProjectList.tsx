@@ -6,6 +6,7 @@ import ProjectCard from "@/features/projects/components/ProjectCard";
 import { Search, Filter, X, Loader2 } from "lucide-react";
 import { fetcher } from "@/services/fetcher";
 import useSWR from "swr";
+import { easeOut } from "framer-motion";
 
 const ProjectList = () => {
   const [query, setQuery] = useState("");
@@ -119,7 +120,7 @@ const ProjectList = () => {
                 transition={{
                   duration: 0.4,
                   delay: index * 0.1,
-                  ease: "easeOut",
+                  ease: easeOut,
                 }}
               >
                 <ProjectCard

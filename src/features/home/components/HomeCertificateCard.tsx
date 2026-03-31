@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Award, ExternalLink, Calendar, Building } from "lucide-react";
+import { ExternalLink, Calendar, Building } from "lucide-react";
+import { easeOut } from "framer-motion";
 
 interface CertificateCardProps {
   title: string;
@@ -27,7 +28,7 @@ const HomeCertificateCard = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

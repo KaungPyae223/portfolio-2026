@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { ExternalLink, Github, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { easeOut } from "framer-motion";
 
 interface ProjectDetailHeroProps {
   title: string;
@@ -25,7 +26,7 @@ const ProjectDetailHero = ({
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
         staggerChildren: 0.2,
       },
     },
@@ -38,7 +39,7 @@ const ProjectDetailHero = ({
       y: 0,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

@@ -6,6 +6,7 @@ import Image from "next/image";
 import ProjectCard from "./HomeProjectCard";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { easeOut } from "framer-motion";
 
 const HomeProjects = ({ projects }: { projects: any[] }) => {
   const t = useTranslations("home");
@@ -17,7 +18,7 @@ const HomeProjects = ({ projects }: { projects: any[] }) => {
       y: 0,
       transition: {
         duration: 1.2,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

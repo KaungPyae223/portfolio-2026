@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Tag } from "lucide-react";
 import { useDetailsStore } from "@/store/useDetailsStore";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import { easeOut } from "framer-motion";
 
 const HomeProjectDetails = () => {
   const detailContainer = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ const HomeProjectDetails = () => {
       height: "auto",
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useDetailsStore } from "@/store/useDetailsStore";
+import { easeOut } from "framer-motion";
 
 import { useRouter } from "@/i18n/navigation";
 
@@ -19,7 +20,7 @@ const HomeProjectCard = ({
   id: number;
   image: string;
 }) => {
-  const { setDetailsContent, detailsContent } = useDetailsStore();
+  const { setDetailsContent } = useDetailsStore();
 
   const projectVariants = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
@@ -29,7 +30,7 @@ const HomeProjectCard = ({
       scale: 1,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };

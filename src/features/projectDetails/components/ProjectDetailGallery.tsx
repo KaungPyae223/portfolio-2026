@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Expand, ChevronLeft, ChevronRight } from "lucide-react";
+import { easeOut, easeIn } from "framer-motion";
 
 interface ProjectDetailGalleryProps {
   images: string[];
@@ -19,7 +20,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
       y: 0,
       transition: {
         duration: 0.8,
-        ease: "easeOut",
+        ease: easeOut,
         staggerChildren: 0.1,
       },
     },
@@ -32,7 +33,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
       scale: 1,
       transition: {
         duration: 0.6,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
   };
@@ -44,7 +45,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
       scale: 1,
       transition: {
         duration: 0.3,
-        ease: "easeOut",
+        ease: easeOut,
       },
     },
     exit: {
@@ -52,7 +53,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
       scale: 0.8,
       transition: {
         duration: 0.2,
-        ease: "easeIn",
+        ease: easeIn,
       },
     },
   };
