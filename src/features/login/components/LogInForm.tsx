@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 import { Toaster } from "@/components/ui/sonner";
+import { Link } from "@/i18n/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -48,9 +49,6 @@ const LogInForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    // Simulate API call
-
     try {
       setIsLoading(true);
 
@@ -168,9 +166,12 @@ const LogInForm = () => {
         <CardFooter>
           <p className="text-center text-sm text-muted-foreground w-full">
             Don't have an account?{" "}
-            <button className="font-medium text-primary hover:text-primary/80">
+            <Link
+              href="/register"
+              className="font-medium text-primary hover:text-primary/80"
+            >
               Register
-            </button>
+            </Link>
           </p>
         </CardFooter>
       </Card>

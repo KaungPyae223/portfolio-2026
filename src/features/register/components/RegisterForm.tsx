@@ -20,12 +20,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useRouter } from "@/i18n/navigation";
+import { api } from "@/services/api";
+import { mutate } from "swr";
 
 const formSchema = z
   .object({
-    name: z.string().min(2, {
-      message: "Name must be at least 2 characters.",
-    }),
     email: z.string().email({
       message: "Please enter a valid email address.",
     }),
@@ -47,20 +48,31 @@ const RegisterForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
   });
 
+  const router = useRouter();
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    // Simulate API call
-    console.log(values);
-    setTimeout(() => {
+    try {
+      setIsLoading(true);
+
+      const response = await api.post("/auth/register", {
+        email: values.email,
+        password: values.password,
+      });
+
+      toast.success("Login successful");
+      mutate("/auth/check-auth");
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error("Failed to create account. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -93,24 +105,6 @@ const RegisterForm = () => {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your name"
-                        className="bg-background"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="email"
