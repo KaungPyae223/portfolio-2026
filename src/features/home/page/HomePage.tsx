@@ -10,11 +10,10 @@ import HomeCertificates from "../components/HomeCertificates";
 import useSWR from "swr";
 import { fetcher } from "@/services/fetcher";
 import Loading from "@/features/global/components/Loading";
-import { useSearchParams } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import { useLocale } from "next-intl";
 
 const HomePage = () => {
-  
   const locale = useLocale();
 
   const language = locale == "en" ? "English" : "Japanese";
@@ -26,7 +25,7 @@ const HomePage = () => {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
-    }
+    },
   );
 
   if (isLoading) return <Loading />;
@@ -34,6 +33,7 @@ const HomePage = () => {
 
   return (
     <>
+      <Analytics />
       <HomeProjectDetails />
       <Container>
         <HomeHeroSection
