@@ -30,6 +30,8 @@ const ProjectPage = () => {
     () => fetcher(`/project?q=${debouncedQuery}`),
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
     },
   );

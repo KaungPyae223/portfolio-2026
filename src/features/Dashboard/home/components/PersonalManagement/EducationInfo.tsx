@@ -44,8 +44,10 @@ const EducationInfo = () => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
-    }
+    },
   );
 
   // 1. Define your form.

@@ -112,11 +112,11 @@ const HomeContactManagementForm = () => {
             </Button>
           </Link>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-3">
+        <CardContent>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 rounded-xl border h-fit border-gray-200 bg-white p-6 shadow-sm"
+              className="space-y-6 rounded-xl mx-auto max-w-2xl border h-fit border-gray-200 bg-white p-6 shadow-sm"
             >
               {/* Header */}
               <div className="space-y-1">

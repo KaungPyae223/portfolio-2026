@@ -21,8 +21,10 @@ const PersonalInfoManagementForm = () => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
-    }
+    },
   );
 
   console.log(data);

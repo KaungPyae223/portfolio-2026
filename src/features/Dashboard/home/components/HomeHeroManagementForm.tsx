@@ -54,8 +54,10 @@ const HomeHeroManagementForm = () => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
-    }
+    },
   );
 
   const [activeTab, setActiveTab] = useState("English");
@@ -74,7 +76,7 @@ const HomeHeroManagementForm = () => {
     if (isLoading) return;
 
     const selectedData = data?.data.find(
-      (item: any) => item.language === activeTab
+      (item: any) => item.language === activeTab,
     );
 
     form.setValue("prefix", selectedData?.prefix);

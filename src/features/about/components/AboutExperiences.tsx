@@ -1,43 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-// Define the experience data with better structure and content
-const experiencesData = [
-  {
-    title: "Frontend Development",
-    icon: "🎨",
-    skills: ["HTML5", "CSS3", "JavaScript", "TypeScript", "React", "Next.js"],
-    description:
-      "Building responsive, accessible web interfaces with modern frameworks and best practices. Experienced in component-based architecture and state management.",
-    level: "Advanced",
-  },
-  {
-    title: "Styling & Design",
-    icon: "🎯",
-    skills: ["Tailwind CSS", "Material UI", "Styled Components", "SASS"],
-    description:
-      "Creating beautiful, maintainable designs using modern CSS frameworks and design systems. Proficient with utility-first CSS and component libraries.",
-    level: "Intermediate",
-  },
-  {
-    title: "Backend Development",
-    icon: "⚙️",
-    skills: ["Node.js", "Express", "Laravel", "REST APIs"],
-    description:
-      "Developing robust server-side applications and RESTful APIs. Experience with database design and server deployment.",
-    level: "Intermediate",
-  },
-  {
-    title: "Tools & Workflow",
-    icon: "🛠️",
-    skills: ["Git", "VS Code", "Figma", "Webpack", "Vite"],
-    description:
-      "Using modern development tools and workflows for efficient code management and collaboration. Comfortable with version control and modern build tools.",
-    level: "Advanced",
-  },
-];
-
-const AboutExperiences = () => {
+const AboutExperiences = ({ experienceData }: { experienceData: any }) => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -107,13 +71,13 @@ const AboutExperiences = () => {
 
         {/* Experience Cards Grid */}
         <motion.div
-          className="grid md:grid-cols-2 gap-8 mb-16"
+          className="grid lg:grid-cols-2 grid-cols-1 gap-8 mb-16"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ amount: 0.2, once: true }}
         >
-          {experiencesData.map((experience, index) => (
+          {experienceData.map((experience: any, index: number) => (
             <motion.div
               key={index}
               className="experience-card group relative bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 p-8 border border-gray-100 dark:border-gray-700 hover:border-yellow-400 dark:hover:border-yellow-500"

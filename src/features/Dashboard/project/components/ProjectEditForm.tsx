@@ -174,6 +174,8 @@ const ProjectEditForm = ({ id }: { id: string }) => {
 
   const { data, error } = useSWR(`/project/${id}`, fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
     errorRetryCount: 3,
   });
 

@@ -55,8 +55,10 @@ const HomeSkillEditForm = () => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
-    }
+    },
   );
 
   const [skillImage, setSkillImage] = useState<string | null>(null);

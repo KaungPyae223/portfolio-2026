@@ -24,6 +24,8 @@ const ProjectList = () => {
 
   const { data, error, isLoading } = useSWR(`project`, fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
     errorRetryCount: 3,
   });
 

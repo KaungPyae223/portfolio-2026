@@ -27,59 +27,83 @@ const DashboardDemoPage: React.FC<Props> = ({ section }) => {
 
   const darkMode = searchParams.get("dark") === "true";
 
-  const { data, error, isLoading } = useSWR(
-    `/user-side/home?language=${language}`,
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-    }
-  );
+  const {
+    data: homeData,
+    error: homeError,
+    isLoading: homeIsLoading,
+  } = useSWR(`/user-side/home?language=${language}`, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    errorRetryCount: 3,
+  });
+
+  const {
+    data: aboutData,
+    error: aboutError,
+    isLoading: aboutIsLoading,
+  } = useSWR(`/user-side/about?language=${language}`, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+  });
 
   const sectionMap: Record<string, React.ReactNode> = {
     homeHero: (
       <HomeHeroSection
-        prefix={data?.data.prefix}
-        name={data?.data.name}
-        title={data?.data.title}
-        content={data?.data.content}
+        prefix={homeData?.data.prefix}
+        name={homeData?.data.name}
+        title={homeData?.data.title}
+        content={homeData?.data.content}
       />
     ),
     homePersonalInfo: (
       <HomePersonalInfo
-        profileURL={data?.data.profileURL}
-        name={data?.data.name}
-        dob={data?.data.date_of_birth}
-        location={data?.data.location}
-        email={data?.data.email}
-        phone={data?.data.phone}
-        educations={data?.data.educations}
-        experiences={data?.data.experiences}
-        cvURL={data?.data.cvURL}
+        profileURL={homeData?.data.profileURL}
+        name={homeData?.data.name}
+        dob={homeData?.data.date_of_birth}
+        location={homeData?.data.location}
+        email={homeData?.data.email}
+        phone={homeData?.data.phone}
+        educations={homeData?.data.educations}
+        experiences={homeData?.data.experiences}
+        cvURL={homeData?.data.cvURL}
       />
     ),
-    homeSkills: <HomeSkills skills={data?.data.skills} />,
+    homeSkills: <HomeSkills skills={homeData?.data.skills} />,
     homeContact: (
       <HomeContact
-        profileURL={data?.data.profileURL}
-        name={data?.data.name}
-        phone={data?.data.phone}
-        title={data?.data.title}
-        location={data?.data.location}
-        email={data?.data.email}
-        github={data?.data.github}
-        linkedin={data?.data.linkedin}
-        facebook={data?.data.facebook}
+        profileURL={homeData?.data.profileURL}
+        name={homeData?.data.name}
+        phone={homeData?.data.phone}
+        title={homeData?.data.title}
+        location={homeData?.data.location}
+        email={homeData?.data.email}
+        github={homeData?.data.github}
+        linkedin={homeData?.data.linkedin}
+        facebook={homeData?.data.facebook}
       />
     ),
-    aboutIntro: <AboutIntro />,
-    aboutExperiences: <AboutExperiences />,
-    aboutEducation: <AboutEducation />,
+    aboutIntro: (
+      <AboutIntro
+        title={aboutData?.data.title}
+        subtitle={aboutData?.data.subtitle}
+        firstParagraph={aboutData?.data.first_paragraph}
+        secondParagraph={aboutData?.data.second_paragraph}
+        profileURL={aboutData?.data.profileURL}
+      />
+    ),
+    aboutExperiences: (
+      <AboutExperiences experienceData={aboutData?.data.aboutExperience} />
+    ),
+    aboutEducation: (
+      <AboutEducation educationData={aboutData?.data.aboutEducation} />
+    ),
   };
 
-  if (isLoading) return <Loading />;
-  if (error) return <div>Error: {error.message}</div>;
+  if (homeIsLoading || aboutIsLoading) return <Loading />;
+  if (homeError || aboutError)
+    return <div>Error: {homeError?.message || aboutError?.message}</div>;
 
   return (
     <div

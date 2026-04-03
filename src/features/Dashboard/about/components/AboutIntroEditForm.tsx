@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -27,6 +27,10 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
+import { fetcher } from "@/services/fetcher";
+import useSWR, { mutate } from "swr";
+import { api } from "@/services/api";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   title: z
@@ -37,14 +41,8 @@ const formSchema = z.object({
     .string()
     .min(2, { message: "Subtitle is required" })
     .max(100, { message: "Subtitle is too long" }),
-  firstParagraph: z
-    .string()
-    .min(10, { message: "First paragraph is required" })
-    .max(500, { message: "First paragraph is too long" }),
-  secondParagraph: z
-    .string()
-    .min(10, { message: "Second paragraph is required" })
-    .max(500, { message: "Second paragraph is too long" }),
+  firstParagraph: z.string().min(10, { message: "First paragraph is required" }),
+  secondParagraph: z.string().min(10, { message: "Second paragraph is required" }),
 });
 
 interface ProfileImageFile {
@@ -59,85 +57,56 @@ interface ProfileImageFile {
 type FormValues = z.infer<typeof formSchema>;
 
 const AboutIntroEditForm = () => {
-  const [profileImage, setProfileImage] = useState<ProfileImageFile | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeTab, setActiveTab] = useState("English");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "Introduction",
-      subtitle: "of My Story",
-      firstParagraph: "Hi my name is Kaung Pyae Aung and currently finished the Bachelor of Computing in University of Greenwich. I also have completed the NCC Level 5, Level 4. I have focused on full stack web development, starting my studies at MMSIT, 2023. I also have an work experience from MMSIT work shop program under the control of Sayar Hein Htet Zan.",
-      secondParagraph: "Throughout my developer journey, I have worked on various assignments, self-initiated projects, workshop programs and gaining practical experience in HTML, CSS, JavaScript, Tailwind CSS, React, Next.js and Laravel. While I acknowledge that my current coding practices need refinement to meet real-world standards, I am eager to improve through junior positions or internships. I am passionate about learning and tackling new challenges, continually striving to create and innovate.",
+      title: "",
+      subtitle: "",
+      firstParagraph: "",
+      secondParagraph: "",
     },
   });
 
-  const handleFileUpload = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const { data, error, isLoading } = useSWR("/about/get-all-intro", fetcher, {
+    revalidateOnFocus: false,
+    errorRetryCount: 3,
+  });
 
-    const file = files[0];
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
+  useEffect(() => {
+    if (isLoading) return;
 
-    if (!validTypes.includes(file.type)) {
-      alert("Please upload a JPEG, PNG, or WebP image");
-      return;
-    }
+    const selectedData = data?.data.find(
+      (item: any) => item.language === activeTab,
+    );
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB");
-      return;
-    }
+    form.setValue("title", selectedData?.title);
+    form.setValue("subtitle", selectedData?.subtitle);
+    form.setValue("firstParagraph", selectedData?.first_paragraph);
+    form.setValue("secondParagraph", selectedData?.second_paragraph);
+  }, [data, activeTab, isLoading]);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const newProfileImage: ProfileImageFile = {
-        id: Date.now().toString(),
-        name: file.name,
-        size: `${(file.size / 1024).toFixed(2)} KB`,
-        uploadDate: new Date().toLocaleDateString(),
-        url: e.target?.result as string,
-        file: file,
-      };
-      setProfileImage(newProfileImage);
-    };
-    reader.readAsDataURL(file);
-  };
+   async function onSubmit(values: z.infer<typeof formSchema>) {
+     try {
+       await api.put("/about/update-intro", {
+         title: values.title,
+         subtitle: values.subtitle,
+         first_paragraph: values.firstParagraph,
+         second_paragraph: values.secondParagraph,
+         language: activeTab,
+       });
+       mutate("/about/get-all-intro");
+       mutate("/user-side/about?language=" + activeTab);
+       toast.success("Updated successfully");
+       // router.push("/dashboard/home");
+     } catch (error: any) {
+       const message = error.response?.data?.message || "Something went wrong";
+       toast.error(message);
+     }
+   }
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    handleFileUpload(e.dataTransfer.files);
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileUpload(event.target.files);
-  };
-
-  const removeImage = () => {
-    setProfileImage(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  function onSubmit(values: FormValues) {
-    const formData = {
-      ...values,
-      profileImage: profileImage?.file,
-    };
-    console.log(formData);
-  }
+  console.log(data);
 
   return (
     <div>
@@ -163,13 +132,25 @@ const AboutIntroEditForm = () => {
               </div>
 
               <div className="inline-flex rounded-lg bg-gray-100 p-1">
-                <button className="rounded-md bg-white px-4 py-1.5 text-sm font-medium shadow">
+                <button
+                  onClick={() => setActiveTab("English")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-medium ${
+                    activeTab === "English"
+                      ? "bg-white shadow"
+                      : "text-gray-600 hover:text-black"
+                  }`}
+                >
                   English
                 </button>
-                <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
-                  Myanmar
-                </button>
-                <button className="rounded-md px-4 py-1.5 text-sm text-gray-600 hover:text-black">
+
+                <button
+                  onClick={() => setActiveTab("Japanese")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-medium ${
+                    activeTab === "Japanese"
+                      ? "bg-white shadow"
+                      : "text-gray-600 hover:text-black"
+                  }`}
+                >
                   Japanese
                 </button>
               </div>
@@ -240,98 +221,15 @@ const AboutIntroEditForm = () => {
                 )}
               />
 
-              <div className="space-y-4">
-                <FormLabel>Profile Image</FormLabel>
-                
-                {/* Current Profile Image */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-gray-700">Current Image</h3>
-                  
-                  {profileImage ? (
-                    <Item
-                      variant="muted"
-                      className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-300 transition-colors"
-                    >
-                      <ItemContent className="flex-1">
-                        <div className="flex items-center gap-4">
-                          <div className="relative">
-                            <img
-                              src={profileImage.url}
-                              alt="Profile"
-                              className="w-16 h-16 rounded-lg object-cover border-2 border-white shadow-sm"
-                            />
-                          </div>
-                          <div>
-                            <ItemTitle className="text-gray-900 font-semibold">
-                              {profileImage.name}
-                            </ItemTitle>
-                            <ItemDescription className="text-gray-600 text-sm">
-                              {profileImage.size} • Uploaded {profileImage.uploadDate}
-                            </ItemDescription>
-                          </div>
-                        </div>
-                      </ItemContent>
-                      <ItemActions>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          className="hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-colors"
-                          onClick={removeImage}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </ItemActions>
-                    </Item>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground border-2 border-dashed border-gray-300 rounded-lg">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-                      <p>No profile image uploaded</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Upload Area */}
-                <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-gray-50 to-white p-6 space-y-4">
-                  <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <span className="w-1 h-4 bg-gray-500 rounded-full"></span>
-                    {profileImage ? "Change Profile Image" : "Upload Profile Image"}
-                  </h3>
-
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      isDragging
-                        ? "border-purple-400 bg-purple-50"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                  >
-                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <p className="text-sm text-gray-600 mb-2">
-                      Drag and drop your image here, or click to browse
-                    </p>
-                    <p className="text-xs text-gray-500 mb-4">
-                      JPEG, PNG, or WebP (Max 5MB, Recommended: 400x400px)
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="mb-2"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Choose Image
-                    </Button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                    />
-                  </div>
+              <div className="bg-gray-200 p-3 rounded-lg">
+                <div>
+                  <ItemContent>
+                    <ItemTitle>Notice</ItemTitle>
+                    <ItemDescription>
+                      Profile Image is used from the data of Personal Info
+                      Section
+                    </ItemDescription>
+                  </ItemContent>
                 </div>
               </div>
 
@@ -341,7 +239,7 @@ const AboutIntroEditForm = () => {
             </form>
           </Form>
 
-          <div className="rounded-xl border border-gray-200 h-full flex flex-col bg-white p-4 shadow-sm">
+          <div className="rounded-xl border border-gray-200 h-fit flex flex-col bg-white p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold">Preview</h2>
@@ -352,8 +250,8 @@ const AboutIntroEditForm = () => {
               <Badge variant="outline">Live</Badge>
             </div>
 
-            <div className="overflow-hidden h-full rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3">
-              <div className="min-h-screen items-center grid grid-cols-1 gap-10">
+            <div className="overflow-hidden  rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3">
+              <div className="items-center grid grid-cols-1 gap-10">
                 <div>
                   <p className="text-5xl pt-3 dark:text-white mb-10 leading-[5rem]">
                     <span className="p-3 px-6 font-medium rounded-xl bg-yellow-300 dark:bg-yellow-500 text-black dark:text-gray-900">
@@ -363,27 +261,14 @@ const AboutIntroEditForm = () => {
                   </p>
                   <p className="text-justify dark:text-white mt-10 mb-5">
                     <span className="ms-16"></span>
-                    {form.watch("firstParagraph") || "Your first paragraph will appear here..."}
+                    {form.watch("firstParagraph") ||
+                      "Your first paragraph will appear here..."}
                   </p>
                   <p className="text-justify dark:text-white mt-10 mb-5">
                     <span className="ms-16"></span>
-                    {form.watch("secondParagraph") || "Your second paragraph will appear here..."}
+                    {form.watch("secondParagraph") ||
+                      "Your second paragraph will appear here..."}
                   </p>
-                </div>
-                <div className="flex justify-center">
-                  {profileImage ? (
-                    <img
-                      className="rounded-2xl shadow-xl w-full max-w-sm object-cover"
-                      src={profileImage.url}
-                      alt="Profile"
-                      width={500}
-                      height={500}
-                    />
-                  ) : (
-                    <div className="rounded-2xl shadow-xl w-full max-w-sm h-64 bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-500">No image</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

@@ -23,6 +23,8 @@ const CertificatesList = () => {
 
   const { data, error, isLoading } = useSWR(`/certificate`, fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
     errorRetryCount: 3,
   });
 

@@ -14,6 +14,8 @@ const ProjectDetailsPage = ({ id }: { id: string }) => {
 
   const { data, error, isLoading } = useSWR(`/project/${id}`, fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
     errorRetryCount: 3,
   });
 

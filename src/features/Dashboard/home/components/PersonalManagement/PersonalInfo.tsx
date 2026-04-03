@@ -49,8 +49,10 @@ const PersonalInfo = () => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
       errorRetryCount: 3,
-    }
+    },
   );
 
   const [activeTab, setActiveTab] = useState("English");

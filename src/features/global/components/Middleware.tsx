@@ -9,7 +9,7 @@ const Middleware = ({ children }: { children: React.ReactNode }) => {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
     revalidateIfStale: false,
-    dedupingInterval: 15 * 60 * 1000,
+    dedupingInterval: 60 * 1000,
   });
 
   return <>{children}</>;

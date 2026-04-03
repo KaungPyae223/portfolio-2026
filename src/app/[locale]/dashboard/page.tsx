@@ -1,9 +1,7 @@
-import React from 'react'
+import IntroPage from "@/features/Dashboard/intro/pages/IntroPage";
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
+  return <IntroPage />;
 }
 
 export default page
