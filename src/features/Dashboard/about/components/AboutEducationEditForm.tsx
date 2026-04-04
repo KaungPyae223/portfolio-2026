@@ -62,7 +62,7 @@ const AboutEducationEditForm = () => {
   };
 
   const removeEducationItem = (index: number) => {
-    const newEducationData = educationData.filter((_, i) => i !== index);
+    const newEducationData = educationData.filter((_: any, i: number) => i !== index);
     setEducationData(newEducationData);
   };
 

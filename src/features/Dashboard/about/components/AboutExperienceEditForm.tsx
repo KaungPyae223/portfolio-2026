@@ -60,7 +60,7 @@ const AboutExperienceEditForm = () => {
   };
 
   const removeExperienceItem = (index: number) => {
-    const newExperienceData = experienceData.filter((_, i) => i !== index);
+    const newExperienceData = experienceData.filter((_: any, i: number) => i !== index);
     setExperienceData(newExperienceData);
   };
 
