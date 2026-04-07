@@ -9,8 +9,6 @@ import { easeOut } from "framer-motion";
 const HomeCertificates = ({ certificates }: { certificates: any }) => {
   const t = useTranslations("home");
 
-  console.log(certificates);
-
   const titleVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -70,7 +68,7 @@ const HomeCertificates = ({ certificates }: { certificates: any }) => {
                 date={certificate.complete_date}
                 image={certificate.image}
                 credentialUrl={certificate.url}
-                skills={certificate.technologies.split(",")}
+                skills={certificate.technologies.split("/")}
               />
             ))}
           </div>
