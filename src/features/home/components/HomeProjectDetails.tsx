@@ -47,7 +47,7 @@ const HomeProjectDetails = () => {
         windowHeight - detailContainer.current.clientHeight / 2
       ) {
         moveContainerY(
-          windowHeight - detailContainer.current.clientHeight - 20
+          windowHeight - detailContainer.current.clientHeight - 20,
         );
       } else {
         moveContainerY(clientY - detailContainer.current.clientHeight / 2);
@@ -107,7 +107,7 @@ const HomeProjectDetails = () => {
 
       <div className="p-6">
         <div className="mb-6">
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-gray-600 line-clamp-5 dark:text-gray-300 leading-relaxed">
             {detailsContent.description}
           </p>
         </div>
@@ -118,7 +118,7 @@ const HomeProjectDetails = () => {
             Technologies
           </h4>
           <div className="flex flex-wrap gap-2">
-            {detailsContent.technologies.map((tech: string) => (
+            {detailsContent.technologies.slice(0, 5).map((tech: string) => (
               <span
                 key={tech}
                 className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm font-medium rounded-full"
@@ -126,6 +126,11 @@ const HomeProjectDetails = () => {
                 {tech}
               </span>
             ))}
+            {detailsContent.technologies.length > 5 && (
+              <span className="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm font-medium rounded-full">
+                +{detailsContent.technologies.length - 5}
+              </span>
+            )}
           </div>
         </div>
 
@@ -134,7 +139,7 @@ const HomeProjectDetails = () => {
             Key Features
           </h4>
           <ul className="space-y-2">
-            {detailsContent.features.map((feature: string) => (
+            {detailsContent.features.slice(0, 5).map((feature: string) => (
               <li
                 key={feature}
                 className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
@@ -143,6 +148,12 @@ const HomeProjectDetails = () => {
                 {feature}
               </li>
             ))}
+            {detailsContent.features.length > 5 && (
+              <li className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full" />+
+                {detailsContent.features.length - 5} more
+              </li>
+            )}
           </ul>
         </div>
 
