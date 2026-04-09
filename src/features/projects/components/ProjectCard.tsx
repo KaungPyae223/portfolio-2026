@@ -68,16 +68,14 @@ const ProjectCard = ({
               </Link>
             )}
 
-            {demoLink && (
-              <Link
-                href={`/projects/${id}`}
-                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ExternalLink className="w-4 h-4" />
-                <span className="text-sm font-medium">View Details</span>
-              </Link>
-            )}
+            <Link
+              href={`/projects/${id}`}
+              className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span className="text-sm font-medium">View Details</span>
+            </Link>
           </div>
         </div>
 
