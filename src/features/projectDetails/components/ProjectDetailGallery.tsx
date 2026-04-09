@@ -6,13 +6,16 @@ import { X, Expand, ChevronLeft, ChevronRight } from "lucide-react";
 import { easeOut, easeIn } from "framer-motion";
 
 interface ProjectDetailGalleryProps {
-  images: string[];
+  images: any[];
   title: string;
+  setSelectedImage: (index: number) => void;
 }
 
-const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
-  const [selectedImage, setSelectedImage] = useState<number | null>(null);
-
+const ProjectDetailGallery = ({
+  images,
+  title,
+  setSelectedImage,
+}: ProjectDetailGalleryProps) => {
   const galleryVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: {
@@ -36,42 +39,6 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
         ease: easeOut,
       },
     },
-  };
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.3,
-        ease: easeOut,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      transition: {
-        duration: 0.2,
-        ease: easeIn,
-      },
-    },
-  };
-
-  const handlePrevious = () => {
-    if (selectedImage !== null) {
-      setSelectedImage(
-        selectedImage === 0 ? images.length - 1 : selectedImage - 1
-      );
-    }
-  };
-
-  const handleNext = () => {
-    if (selectedImage !== null) {
-      setSelectedImage(
-        selectedImage === images.length - 1 ? 0 : selectedImage + 1
-      );
-    }
   };
 
   return (
@@ -99,7 +66,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {images.map((image, index) => (
+            {images?.map((image: any, index: number) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
@@ -107,7 +74,7 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
                 onClick={() => setSelectedImage(index)}
               >
                 <Image
-                  src={image}
+                  src={image.url}
                   alt={`${title} - Image ${index + 1}`}
                   fill
                   className="object-cover group-hover:scale-110 transition-transform duration-500"
@@ -120,69 +87,6 @@ const ProjectDetailGallery = ({ images, title }: ProjectDetailGalleryProps) => {
           </div>
         )}
       </motion.div>
-
-      {/* Image Modal */}
-      <AnimatePresence>
-        {selectedImage !== null && (
-          <motion.div
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-            onClick={() => setSelectedImage(null)}
-          >
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={handlePrevious}
-                  className="absolute left-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="absolute right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-              </>
-            )}
-
-            <div className="relative max-w-4xl max-h-[80vh] w-full">
-              <Image
-                src={images[selectedImage]}
-                alt={`${title} - Image ${selectedImage + 1}`}
-                width={1200}
-                height={800}
-                className="w-full h-full object-contain rounded-lg"
-              />
-              {images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                  {images.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImage(index)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === selectedImage
-                          ? "bg-white"
-                          : "bg-white/50 hover:bg-white/75"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };
